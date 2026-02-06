@@ -449,6 +449,7 @@ function App() {
             <div className="header-title-center">
               <img src={`${process.env.PUBLIC_URL || ''}/emblem.png`} alt="" className="header-emblem-img" />
               <span className="header-org-full">СУДЕБНО-ЭКСПЕРТНЫЙ ЦЕНТР «БЮРО ЭКСПЕРТОВ»</span>
+              <img src={`${process.env.PUBLIC_URL || ''}/emblem.png`} alt="" className="header-emblem-img" />
             </div>
             <Space size="middle" style={{ width: 120, justifyContent: 'flex-end' }}>
               <BellOutlined className="header-icon-dark" style={{ fontSize: 20 }} />
