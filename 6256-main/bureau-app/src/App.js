@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'antd/dist/reset.css';
 import './App.css';
-import { Layout, Menu, Typography, Space, Avatar, Drawer, Button } from 'antd';
+import { Layout, Menu, Space, Avatar, Drawer, Button } from 'antd';
 import {
   UserOutlined,
   FileTextOutlined,
@@ -425,36 +425,31 @@ function App() {
           <Header
             className="app-header"
             style={{
-              background: '#333333',
+              position: 'relative',
+              background: '#ffffff',
               padding: '0 24px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              boxShadow: 'none',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
             }}
           >
-            <Space size="middle">
+            <div style={{ width: 120, display: 'flex', alignItems: 'center' }}>
               {isMobile && (
                 <Button
                   type="text"
                   icon={<MenuUnfoldOutlined />}
                   onClick={() => setDrawerVisible(true)}
-                  style={{ color: '#fff' }}
+                  className="header-icon-dark"
                 />
               )}
-              <Space size="middle">
-                <span className="header-emblem" aria-hidden="true">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L4 6v6c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V6l-8-4z" fill="rgba(255,255,255,0.9)" stroke="rgba(255,255,255,0.5)" strokeWidth="1"/>
-                  </svg>
-                </span>
-                <span className="org-name">{ORG_NAME}</span>
-                <Title level={5} className="header-page-title" style={{ margin: 0, color: '#ffffff', fontWeight: 400 }}>Главная панель управления</Title>
-              </Space>
-            </Space>
-            <Space>
-              <BellOutlined style={{ fontSize: 20, color: '#ffffff' }} />
-              <Avatar size="large" icon={<UserOutlined />} style={{ backgroundColor: '#111' }} />
+            </div>
+            <div className="header-title-center">
+              <span className="header-org-full">СУДЕБНО-ЭКСПЕРТНЫЙ ЦЕНТР «БЮРО ЭКСПЕРТОВ»</span>
+            </div>
+            <Space size="middle" style={{ width: 120, justifyContent: 'flex-end' }}>
+              <BellOutlined className="header-icon-dark" style={{ fontSize: 20 }} />
+              <Avatar size="large" icon={<UserOutlined />} style={{ backgroundColor: '#333' }} />
             </Space>
           </Header>
           <div className="header-tricolor" aria-hidden="true">

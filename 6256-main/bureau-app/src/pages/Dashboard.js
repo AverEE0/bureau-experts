@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 
 const { Content } = Layout;
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const Dashboard = ({ onNavigate }) => {
   const quickLinks = [
@@ -22,8 +22,7 @@ const Dashboard = ({ onNavigate }) => {
   ];
 
   return (
-    <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-      <Title level={2}>Главная панель управления</Title>
+    <Content className="dashboard-content-full">
       {onNavigate && (
         <Card size="small" style={{ marginBottom: 24 }}>
           <Text type="secondary" style={{ marginRight: 8 }}>Быстрые переходы:</Text>
