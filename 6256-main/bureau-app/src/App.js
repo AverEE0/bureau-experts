@@ -98,7 +98,6 @@ const PATH_TO_PAGE = {
   '/internal-chat': 'internal-chat',
 };
 const { SubMenu } = Menu;
-const { Title } = Typography;
 
 const ORG_NAME = 'СЭЦ «БЮРО ЭКСПЕРТОВ»';
 
