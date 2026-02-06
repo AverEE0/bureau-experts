@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space } from 'antd';
-import { PhoneOutlined, MailOutlined, MessageOutlined, GlobalOutlined, PlusOutlined, SearchOutlined, SendOutlined } from '@ant-design/icons';
+import { PhoneOutlined, MailOutlined, MessageOutlined, PlusOutlined, SearchOutlined, SendOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space } from 'antd';
 import { BankOutlined, CreditCardOutlined, TransactionOutlined, DollarOutlined, SyncOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;

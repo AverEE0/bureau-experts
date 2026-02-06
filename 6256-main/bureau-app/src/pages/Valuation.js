@@ -11,7 +11,6 @@ import {
   Statistic,
 } from 'antd';
 import {
-  DollarOutlined,
   CalculatorOutlined,
   HomeOutlined,
   PlusOutlined,
@@ -19,7 +18,7 @@ import {
   BankOutlined,
 } from '@ant-design/icons';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 function Valuation() {
   return (

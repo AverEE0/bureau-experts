@@ -22,6 +22,8 @@ jobs:
           cache-dependency-path: 6256-main/bureau-app/package-lock.json
 
       - name: Install and build
+        env:
+          CI: false
         run: |
           cd 6256-main/bureau-app
           npm ci

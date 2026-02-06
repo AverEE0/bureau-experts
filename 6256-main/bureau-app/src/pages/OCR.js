@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space, Upload } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, Upload } from 'antd';
 import { FileTextOutlined, ScanOutlined, CheckCircleOutlined, ExclamationCircleOutlined, UploadOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;

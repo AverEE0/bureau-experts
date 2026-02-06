@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space } from 'antd';
-import { DollarOutlined, BarChartOutlined, PieChartOutlined, LineChartOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { DollarOutlined, BarChartOutlined, PieChartOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 

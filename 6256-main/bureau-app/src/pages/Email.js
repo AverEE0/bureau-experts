@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space, Modal, Form, Input, Select, message } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, Modal, Form, Input, Select, message } from 'antd';
 import { MailOutlined, SendOutlined, InboxOutlined, FileTextOutlined, PlusOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
-const { Option } = Select;
 
 function Email() {
   const [isModalVisible, setIsModalVisible] = useState(false);

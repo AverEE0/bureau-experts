@@ -49,6 +49,7 @@ function Clients() {
         setClients(defaultClients);
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredClients = useMemo(

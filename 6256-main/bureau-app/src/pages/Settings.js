@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
   Card,
-  Row,
-  Col,
   Typography,
   Form,
   Input,
@@ -20,7 +18,6 @@ import {
   ApiOutlined,
   FileTextOutlined,
   GlobalOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;

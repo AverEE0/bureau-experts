@@ -6,8 +6,6 @@ import {
   Checkbox,
   Space,
   Input,
-  Row,
-  Col,
 } from 'antd';
 import { DatabaseOutlined, SettingOutlined } from '@ant-design/icons';
 

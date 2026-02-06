@@ -14,7 +14,6 @@ import {
   FormOutlined,
   PlusOutlined,
   EditOutlined,
-  InfoCircleOutlined,
 } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
@@ -58,7 +57,7 @@ const TEMPLATES = [
 ];
 
 function Templates() {
-  const [selected, setSelected] = useState(null);
+  const [, setSelected] = useState(null);
 
   return (
     <div

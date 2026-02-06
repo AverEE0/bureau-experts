@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, List, Input, Button, Upload, Avatar, Typography, Space, message } from 'antd';
+import { Layout, List, Input, Button, Upload, Avatar, Typography, Space } from 'antd';
 import { SendOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 
 const { Content } = Layout;
