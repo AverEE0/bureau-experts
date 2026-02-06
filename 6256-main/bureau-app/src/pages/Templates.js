@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Row,
@@ -8,17 +8,27 @@ import {
   Space,
   List,
   Tag,
+  Modal,
+  Form,
+  Input,
+  Select,
+  message,
+  Spin,
 } from 'antd';
 import {
   FileTextOutlined,
   FormOutlined,
   PlusOutlined,
   EditOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
+import { api } from '../api';
 
 const { Title, Paragraph, Text } = Typography;
+const { TextArea } = Input;
+const { Option } = Select;
 
-const TEMPLATES = [
+const INITIAL_TEMPLATES = [
   {
     key: 'kvartira',
     name: 'Отчёт об оценке — квартира',
@@ -56,8 +66,127 @@ const TEMPLATES = [
   },
 ];
 
+function downloadBlob(content, filename, mimeType = 'text/plain;charset=utf-8') {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function Templates() {
-  const [, setSelected] = useState(null);
+  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [createTemplateKey, setCreateTemplateKey] = useState(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingKey, setEditingKey] = useState(null);
+  const [deals, setDeals] = useState([]);
+  const [dealsLoading, setDealsLoading] = useState(false);
+  const [createForm] = Form.useForm();
+  const [editForm] = Form.useForm();
+
+  const selectedTemplate = createTemplateKey
+    ? templates.find((t) => t.key === createTemplateKey)
+    : null;
+
+  useEffect(() => {
+    if (createModalVisible) {
+      setDealsLoading(true);
+      api
+        .getDeals()
+        .then((data) => setDeals(Array.isArray(data) ? data : []))
+        .catch(() => setDeals([]))
+        .finally(() => setDealsLoading(false));
+    }
+  }, [createModalVisible]);
+
+  const openCreateModal = (item) => {
+    setCreateTemplateKey(item.key);
+    setCreateModalVisible(true);
+    const today = new Date().toISOString().slice(0, 10);
+    createForm.setFieldsValue({
+      deal_id: undefined,
+      client_name: '',
+      object_address: '',
+      date: today,
+      note: '',
+    });
+  };
+
+  const handleCreateDocument = () => {
+    createForm.validateFields().then((values) => {
+      const t = selectedTemplate;
+      const deal = values.deal_id ? deals.find((d) => String(d.id) === String(values.deal_id)) : null;
+      const clientName = values.client_name || (deal && deal.client_name) || '—';
+      const content = [
+        `Документ по шаблону: ${t ? t.name : ''}`,
+        `Файл шаблона: ${t && t.file ? t.file : '—'}`,
+        '',
+        '--- Подставленные данные ---',
+        `Заказчик: ${clientName}`,
+        `Адрес объекта: ${values.object_address || '—'}`,
+        `Дата: ${values.date || '—'}`,
+        values.note ? `Примечание: ${values.note}` : '',
+        '',
+        'Сгенерировано в СЭЦ «БЮРО ЭКСПЕРТОВ».',
+      ].filter(Boolean).join('\n');
+
+      const safeName = (t && t.file ? t.file.replace(/\.docx?$/i, '') : t ? t.key : 'document') + '_черновик.txt';
+      downloadBlob(content, safeName);
+      message.success('Черновик документа создан и скачан');
+      setCreateModalVisible(false);
+      setCreateTemplateKey(null);
+      createForm.resetFields();
+    }).catch(() => {});
+  };
+
+  const openEditModal = (item) => {
+    setEditingKey(item.key);
+    setEditModalVisible(true);
+    editForm.setFieldsValue({
+      name: item.name,
+      file: item.file || '',
+      description: item.description || '',
+    });
+  };
+
+  const handleEditSave = () => {
+    editForm.validateFields().then((values) => {
+      setTemplates((prev) =>
+        prev.map((t) =>
+          t.key === editingKey
+            ? {
+                ...t,
+                name: values.name,
+                file: values.file || undefined,
+                description: values.description || '',
+              }
+            : t
+        )
+      );
+      message.success('Изменения сохранены');
+      setEditModalVisible(false);
+      setEditingKey(null);
+      editForm.resetFields();
+    }).catch(() => {});
+  };
+
+  const handleDownloadTemplate = (item) => {
+    const content = [
+      `Шаблон: ${item.name}`,
+      item.file ? `Имя файла: ${item.file}` : '',
+      '',
+      item.description || '',
+      '',
+      '---',
+      'Для получения полного шаблона в формате .docx обратитесь к администратору или загрузите файл в раздел «Документы».',
+    ].filter(Boolean).join('\n');
+    const filename = (item.file || item.key) + (item.file && /\.docx?$/i.test(item.file) ? '' : '.txt');
+    downloadBlob(content, filename);
+    message.success('Файл шаблона скачан');
+  };
 
   return (
     <div
@@ -80,7 +209,7 @@ function Templates() {
       <Row gutter={24} style={{ marginTop: 24 }}>
         <Col span={14}>
           <List
-            dataSource={TEMPLATES}
+            dataSource={templates}
             renderItem={(item) => (
               <List.Item
                 actions={[
@@ -88,13 +217,28 @@ function Templates() {
                     type="primary"
                     size="small"
                     icon={<PlusOutlined />}
-                    onClick={() => setSelected(item.key)}
+                    onClick={() => openCreateModal(item)}
                   >
                     Создать документ
                   </Button>,
-                  <Button size="small" icon={<EditOutlined />}>
+                  <Button
+                    size="small"
+                    icon={<EditOutlined />}
+                    onClick={() => openEditModal(item)}
+                  >
                     Редактировать
                   </Button>,
+                  ...(item.file
+                    ? [
+                        <Button
+                          size="small"
+                          icon={<DownloadOutlined />}
+                          onClick={() => handleDownloadTemplate(item)}
+                        >
+                          Скачать шаблон
+                        </Button>,
+                      ]
+                    : []),
                 ]}
               >
                 <List.Item.Meta
@@ -132,6 +276,105 @@ function Templates() {
           </Card>
         </Col>
       </Row>
+
+      {/* Модалка: Создать документ */}
+      <Modal
+        title={
+          <Space>
+            <PlusOutlined />
+            Создать документ по шаблону
+            {selectedTemplate && (
+              <Tag color="blue">{selectedTemplate.name}</Tag>
+            )}
+          </Space>
+        }
+        open={createModalVisible}
+        onOk={handleCreateDocument}
+        onCancel={() => {
+          setCreateModalVisible(false);
+          setCreateTemplateKey(null);
+          createForm.resetFields();
+        }}
+        okText="Создать и скачать черновик"
+        cancelText="Отмена"
+        width={520}
+        destroyOnClose
+      >
+        <Spin spinning={dealsLoading} tip="Загрузка списка сделок...">
+          <Form
+            form={createForm}
+            layout="vertical"
+            style={{ marginTop: 16 }}
+          >
+            <Form.Item
+              name="deal_id"
+              label="Привязать к сделке"
+              help="Если выбрано — заказчик подставится из сделки"
+            >
+              <Select
+                placeholder="Без привязки"
+                allowClear
+                showSearch
+                optionFilterProp="children"
+                onChange={(value) => {
+                  const deal = value ? deals.find((d) => String(d.id) === String(value)) : null;
+                  createForm.setFieldValue('client_name', deal && deal.client_name ? deal.client_name : '');
+                }}
+              >
+                {deals.map((d) => (
+                  <Option key={d.id} value={String(d.id)}>
+                    {d.client_name || `Сделка #${d.id}`} {d.stage ? ` — ${d.stage}` : ''}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item name="client_name" label="Заказчик (ФИО / наименование)">
+              <Input placeholder="Заполнится из сделки или введите вручную" />
+            </Form.Item>
+            <Form.Item name="object_address" label="Адрес объекта">
+              <Input placeholder="Адрес и/или кадастровый номер" />
+            </Form.Item>
+            <Form.Item name="date" label="Дата документа" rules={[{ required: true }]}>
+              <Input type="date" />
+            </Form.Item>
+            <Form.Item name="note" label="Примечание">
+              <TextArea rows={2} placeholder="Дополнительные данные для подстановки" />
+            </Form.Item>
+          </Form>
+        </Spin>
+      </Modal>
+
+      {/* Модалка: Редактировать шаблон */}
+      <Modal
+        title="Редактировать шаблон"
+        open={editModalVisible}
+        onOk={handleEditSave}
+        onCancel={() => {
+          setEditModalVisible(false);
+          setEditingKey(null);
+          editForm.resetFields();
+        }}
+        okText="Сохранить"
+        cancelText="Отмена"
+        width={520}
+        destroyOnClose
+      >
+        <Form form={editForm} layout="vertical" style={{ marginTop: 16 }}>
+          <Form.Item
+            name="name"
+            label="Название шаблона"
+            rules={[{ required: true, message: 'Введите название' }]}
+          >
+            <Input placeholder="Например: Отчёт об оценке — квартира" />
+          </Form.Item>
+          <Form.Item name="file" label="Имя файла (необязательно)">
+            <Input placeholder="шаблон_квартира.docx" />
+          </Form.Item>
+          <Form.Item name="description" label="Описание">
+            <TextArea rows={4} placeholder="Описание шаблона и полей для подстановки" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }
