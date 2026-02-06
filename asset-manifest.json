@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/bureau-experts/static/css/main.aa5b63da.css",
+    "main.js": "/bureau-experts/static/js/main.701c5440.js",
+    "static/js/453.7bc01aa1.chunk.js": "/bureau-experts/static/js/453.7bc01aa1.chunk.js",
+    "index.html": "/bureau-experts/index.html",
+    "main.aa5b63da.css.map": "/bureau-experts/static/css/main.aa5b63da.css.map",
+    "main.701c5440.js.map": "/bureau-experts/static/js/main.701c5440.js.map",
+    "453.7bc01aa1.chunk.js.map": "/bureau-experts/static/js/453.7bc01aa1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.aa5b63da.css",
+    "static/js/main.701c5440.js"
+  ]
+}
