@@ -5,8 +5,12 @@ import { FileTextOutlined, AuditOutlined, ReconciliationOutlined, BookOutlined, 
 const { Title, Paragraph } = Typography;
 
 function Legal() {
+  const publicUrl = process.env.PUBLIC_URL || '';
   return (
     <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <img src={`${publicUrl}/logo-shield.jpg`} alt="БЮРО ЭКСПЕРТОВ" style={{ maxHeight: 64, objectFit: 'contain' }} />
+      </div>
       <Title level={2}>Юридические Услуги</Title>
       <Paragraph>
         Комплексное юридическое сопровождение экспертной деятельности. Консультации, договоры, судебная защита.

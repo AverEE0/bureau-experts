@@ -17,8 +17,12 @@ function Signatures() {
       setSignDocId(null);
     }).catch(() => message.error('Ошибка'));
   };
+  const publicUrl = process.env.PUBLIC_URL || '';
   return (
     <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+      <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <img src={`${publicUrl}/logo-gavel.jpg`} alt="БЮРО ЭКСПЕРТОВ" style={{ maxHeight: 64, objectFit: 'contain' }} />
+      </div>
       <Title level={2}>Электронные Подписи</Title>
       <Paragraph>
         Электронное подписание документов: КЭП/УКЭП (квалифицированная и усиленная квалифицированная ЭП). Интеграция с КриптоПро, УЦ ФНС и коммерческими УЦ. Юридическая значимость в соответствии с 63-ФЗ.

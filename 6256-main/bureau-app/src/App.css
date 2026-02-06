@@ -214,6 +214,31 @@ a:hover,
   box-sizing: border-box;
 }
 
+/* Баннер на дашборде (логотип с флагом) */
+.dashboard-banner-wrap {
+  width: 100%;
+  max-height: 120px;
+  margin-bottom: 24px;
+  text-align: center;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.dashboard-banner {
+  max-height: 120px;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Логотип в футере */
+.app-footer-text .footer-logo {
+  height: 20px;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 8px;
+  opacity: 0.9;
+}
+
 /* Футер — на всю страницу, прикреплён внизу как рамка окна */
 .app-footer {
   position: fixed;

@@ -272,8 +272,9 @@ function App() {
             }}
           >
             <img
-              src={logoBuro}
+              src={`${process.env.PUBLIC_URL || ''}/logo-seal.jpg`}
               alt="БЮРО ЭКСПЕРТОВ"
+              onError={(e) => { e.target.onerror = null; e.target.src = logoBuro; }}
               style={{
                 maxHeight: siderCollapsed ? 36 : 48,
                 maxWidth: siderCollapsed ? 48 : '80%',
@@ -468,6 +469,7 @@ function App() {
           <span style={{ background: '#d52b1e' }} />
         </div>
         <div className="app-footer-text">
+          <img src={`${process.env.PUBLIC_URL || ''}/logo-gavel.jpg`} alt="" className="footer-logo" />
           <strong>{ORG_NAME}</strong> — © 2026. Все права защищены. Соответствует ФЗ-152, ФЗ-73, ФЗ-135.
         </div>
       </Footer>
