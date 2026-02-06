@@ -159,19 +159,31 @@ a:hover,
 .header-tricolor span:nth-child(2) { flex: 0 0 33.33%; }
 .header-tricolor span:last-child { flex: 0 0 33.34%; }
 
-/* Футер — чёрный, полоса флага сверху */
+/* Футер — прикреплён внизу, тонкая полоска, читаемый текст */
 .app-footer {
+  flex: 0 0 auto;
   text-align: center;
   background: #000000 !important;
   border-top: none;
   color: #ffffff;
-  margin-top: 32px;
+  margin: 0 !important;
   padding: 0 !important;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  width: 100%;
+}
+
+.app-footer-text {
+  padding: 4px 16px 6px !important;
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
 }
 
 .footer-tricolor {
   display: flex;
-  height: 3px;
+  height: 2px;
   width: 100%;
 }
 

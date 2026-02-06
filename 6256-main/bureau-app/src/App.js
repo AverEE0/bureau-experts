@@ -261,9 +261,10 @@ function App() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: '#333',
-              borderBottom: '1px solid #555',
+              background: '#ffffff',
+              borderBottom: '1px solid #e8e8e8',
               padding: siderCollapsed ? '0 8px' : '0 12px',
+              boxShadow: '0 1px 0 rgba(0,0,0,0.06)',
             }}
           >
             <img
@@ -418,8 +419,8 @@ function App() {
           </Menu.Item>
         </Menu>
       </Drawer>
-      <Layout className="app-shell">
-        <div>
+      <Layout className="app-shell" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <div style={{ flex: '0 0 auto' }}>
           <Header
             className="app-header"
             style={{
@@ -461,15 +462,15 @@ function App() {
             <span style={{ background: '#d52b1e' }} />
           </div>
         </div>
-        <div className="app-main">
-          {renderContent()}
+        <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <div style={{ flex: 1, minHeight: 0 }}>{renderContent()}</div>
           <Footer className="app-footer">
             <div className="footer-tricolor" aria-hidden="true">
               <span style={{ background: '#fff' }} />
               <span style={{ background: '#0039a6' }} />
               <span style={{ background: '#d52b1e' }} />
             </div>
-            <div style={{ padding: '12px 0' }}>
+            <div className="app-footer-text">
               <strong>{ORG_NAME}</strong> — © 2026. Все права защищены. Соответствует ФЗ-152, ФЗ-73, ФЗ-135.
             </div>
           </Footer>
