@@ -58,7 +58,7 @@ const Dashboard = ({ onNavigate }) => {
       </Row>
       <Row gutter={24} style={{ marginTop: 24 }}>
         <Col span={12}>
-          <Card title="Динамика доходов и дел" extra={<Button type="link">Подробнее</Button>}>
+          <Card title="Динамика доходов и дел" extra={<Button type="link" onClick={() => onNavigate && onNavigate('reports-analytics')}>Подробнее</Button>}>
             <div style={{ textAlign: 'center', padding: 20 }}>
               <Text>График доходов: Рост на 40% за полгода</Text>
               <br />
@@ -67,7 +67,7 @@ const Dashboard = ({ onNavigate }) => {
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="Распределение бизнес-циклов" extra={<Button type="link">Управление</Button>}>
+          <Card title="Распределение бизнес-циклов" extra={<Button type="link" onClick={() => onNavigate && onNavigate('reports-operational')}>Управление</Button>}>
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span>Судебная экспертиза</span>

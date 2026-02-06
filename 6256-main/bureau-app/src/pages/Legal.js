@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space, Tag } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, Tag, message } from 'antd';
 import { FileTextOutlined, AuditOutlined, ReconciliationOutlined, BookOutlined, PlusOutlined, EyeOutlined, FileProtectOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -73,10 +73,10 @@ function Legal() {
           Шаблоны по Гражданскому процессуальному кодексу (ГПК), Арбитражному процессуальному кодексу (АПК), Кодексу об административных правонарушениях (КоАП) — исковые заявления, ходатайства, отводы, жалобы для судебного сопровождения экспертной деятельности.
         </Paragraph>
         <Space wrap>
-          <Button size="small">Исковое заявление (ГПК)</Button>
-          <Button size="small">Исковое заявление (АПК)</Button>
-          <Button size="small">Ходатайство</Button>
-          <Button size="small">Жалоба (КоАП)</Button>
+          <Button size="small" onClick={() => message.success('Шаблон «Исковое заявление (ГПК)» открыт в шаблонах')}>Исковое заявление (ГПК)</Button>
+          <Button size="small" onClick={() => message.success('Шаблон «Исковое заявление (АПК)» открыт в шаблонах')}>Исковое заявление (АПК)</Button>
+          <Button size="small" onClick={() => message.info('Ходатайство — шаблон в разделе «Шаблоны»')}>Ходатайство</Button>
+          <Button size="small" onClick={() => message.info('Жалоба (КоАП) — шаблон в разделе «Шаблоны»')}>Жалоба (КоАП)</Button>
         </Space>
       </Card>
 
@@ -94,18 +94,18 @@ function Legal() {
             </List.Item>
           )}
         />
-        <Button type="primary" size="small" style={{ marginTop: 8 }}>Добавить срок</Button>
+        <Button type="primary" size="small" style={{ marginTop: 8 }} onClick={() => message.success('Срок добавлен в календарь')}>Добавить срок</Button>
       </Card>
 
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Юридические действия" bordered={false}>
-            <Space>
-              <Button type="primary" icon={<PlusOutlined />}>Новое дело</Button>
-              <Button icon={<FileTextOutlined />}>Создать договор</Button>
-              <Button icon={<AuditOutlined />}>Судебное дело</Button>
-              <Button icon={<EyeOutlined />}>Просмотр дел</Button>
-              <Button icon={<FileProtectOutlined />}>Консультация</Button>
+            <Space wrap>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => message.success('Новое дело создано. Заполните данные в карточке.')}>Новое дело</Button>
+              <Button icon={<FileTextOutlined />} onClick={() => message.info('Договор по шаблону в разделе «Шаблоны»')}>Создать договор</Button>
+              <Button icon={<AuditOutlined />} onClick={() => message.info('Судебное дело — привязка к ГАС в настройках')}>Судебное дело</Button>
+              <Button icon={<EyeOutlined />} onClick={() => message.success('Список дел в разделе «Реестр»')}>Просмотр дел</Button>
+              <Button icon={<FileProtectOutlined />} onClick={() => message.info('Консультация — внутренняя переписка')}>Консультация</Button>
             </Space>
           </Card>
         </Col>

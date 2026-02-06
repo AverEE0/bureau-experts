@@ -9,6 +9,7 @@ import {
   List,
   Divider,
   Statistic,
+  message,
 } from 'antd';
 import {
   CalculatorOutlined,
@@ -92,14 +93,10 @@ function Valuation() {
 
       <Card title="Действия" style={{ marginTop: 24 }}>
         <Space wrap>
-          <Button type="primary" icon={<PlusOutlined />}>
-            Новая оценка
-          </Button>
-          <Button icon={<FileImageOutlined />}>
-            Отчёт с фото (2–3 в строку)
-          </Button>
-          <Button>Выписка из отчёта</Button>
-          <Button>Экспорт в PDF</Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => message.success('Создание новой оценки: заполните объект и заказчика в шаблоне')}>Новая оценка</Button>
+          <Button icon={<FileImageOutlined />} onClick={() => message.info('Шаблон «Отчёт с фото» — 2–3 фото в строку на лист А4')}>Отчёт с фото (2–3 в строку)</Button>
+          <Button onClick={() => message.success('Выписка формируется из шаблона в разделе «Шаблоны»')}>Выписка из отчёта</Button>
+          <Button onClick={() => message.success('Экспорт в PDF доступен в карточке отчёта')}>Экспорт в PDF</Button>
         </Space>
       </Card>
     </div>

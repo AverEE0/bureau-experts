@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Layout, List, Input, Button, Upload, Avatar, Typography, Space } from 'antd';
+import { Layout, List, Input, Button, Upload, Avatar, Typography, Space, message } from 'antd';
 import { SendOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 
 const { Content } = Layout;
@@ -28,15 +28,15 @@ const InternalChat = () => {
 
   const handleSend = () => {
     if (newMessage.trim() || fileList.length > 0) {
-      const attachments = fileList.map(file => file.name);
-      const message = {
+      const attachments = fileList.map((file) => file.name);
+      const newMsg = {
         id: messages.length + 1,
-        sender: 'Текущий пользователь', // В реальном приложении брать из контекста
+        sender: 'Текущий пользователь',
         text: newMessage,
         timestamp: new Date().toLocaleString(),
-        attachments
+        attachments,
       };
-      setMessages([...messages, message]);
+      setMessages([...messages, newMsg]);
       setNewMessage('');
       setFileList([]);
       message.success('Сообщение отправлено!');

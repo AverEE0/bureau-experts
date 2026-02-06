@@ -173,7 +173,21 @@ function Clients() {
             >
               Добавить клиента
             </Button>
-            <Button icon={<ExportOutlined />}>Экспорт</Button>
+            <Button icon={<ExportOutlined />} onClick={() => {
+              const headers = ['Клиент', 'Тип', 'ИНН', 'Телефон', 'Email', 'Статус', 'Сегмент', 'Менеджер'];
+              const rows = filteredClients.map((c) => [c.name, c.type, c.inn, c.phone, c.email, c.status, c.segment, c.manager].map((v) => `"${String(v || '').replace(/"/g, '""')}"`).join(','));
+              const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+              const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `клиенты_${new Date().toISOString().slice(0, 10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+              message.success('Экспорт выполнен');
+            }}>
+              Экспорт
+            </Button>
           </Space>
         </Col>
       </Row>

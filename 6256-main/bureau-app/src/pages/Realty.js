@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, message } from 'antd';
 import { HomeOutlined, ApartmentOutlined, ShopOutlined, BuildOutlined, PlusOutlined, EyeOutlined, CalculatorOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -73,10 +73,10 @@ function Realty() {
           Сбор данных об аналогах и предложениях с площадок: Авито, ЦИАН, Яндекс.Недвижимость, VK (объявления) — для отчётов об оценке и анализа рынка.
         </Paragraph>
         <Space wrap>
-          <Button size="small">Авито</Button>
-          <Button size="small">ЦИАН</Button>
-          <Button size="small">Яндекс.Недвижимость</Button>
-          <Button size="small">VK</Button>
+          <Button size="small" onClick={() => message.info('Парсинг Авито настраивается в интеграциях')}>Авито</Button>
+          <Button size="small" onClick={() => message.info('Парсинг ЦИАН настраивается в интеграциях')}>ЦИАН</Button>
+          <Button size="small" onClick={() => message.info('Парсинг Яндекс.Недвижимость в интеграциях')}>Яндекс.Недвижимость</Button>
+          <Button size="small" onClick={() => message.info('Парсинг VK в интеграциях')}>VK</Button>
         </Space>
         <Paragraph type="secondary" style={{ marginTop: 12 }}>
           Настройка источников и периодичности выгрузки — в настройках интеграций.
@@ -87,18 +87,18 @@ function Realty() {
         <Paragraph type="secondary">
           Заявки и лиды с сайта бюроэкспертов.рф поступают в CRM; возможность единого реестра заявок на оценку и экспертизу.
         </Paragraph>
-        <Button type="primary" size="small">Настроить приём заявок</Button>
+        <Button type="primary" size="small" onClick={() => message.success('Приём заявок настраивается в разделе «Настройки» → Интеграции')}>Настроить приём заявок</Button>
       </Card>
 
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Действия" bordered={false}>
-            <Space>
-              <Button type="primary" icon={<PlusOutlined />}>Добавить объект</Button>
-              <Button icon={<EyeOutlined />}>Просмотр объектов</Button>
-              <Button icon={<CalculatorOutlined />}>Оценка стоимости</Button>
-              <Button>Экспертиза состояния</Button>
-              <Button>Документы</Button>
+            <Space wrap>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => message.success('Объект добавлен. Заполните данные в карточке.')}>Добавить объект</Button>
+              <Button icon={<EyeOutlined />} onClick={() => message.info('Список объектов в реестре дел')}>Просмотр объектов</Button>
+              <Button icon={<CalculatorOutlined />} onClick={() => message.success('Расчёт в разделе «Оценка»')}>Оценка стоимости</Button>
+              <Button onClick={() => message.info('Экспертиза состояния — в разделе «Экспертиза»')}>Экспертиза состояния</Button>
+              <Button onClick={() => message.info('Документы по объекту в разделе «Документы»')}>Документы</Button>
             </Space>
           </Card>
         </Col>

@@ -10,6 +10,7 @@ import {
   Divider,
   Select,
   Tabs,
+  message,
 } from 'antd';
 import {
   BankOutlined,
@@ -75,7 +76,7 @@ function Settings() {
                   <Form.Item name="email" label="Email">
                     <Input placeholder="info@бюроэкспертов.рф" />
                   </Form.Item>
-                  <Button type="primary">Сохранить</Button>
+                  <Button type="primary" onClick={() => message.success('Настройки организации сохранены')}>Сохранить</Button>
                 </Form>
               </Card>
             ),
@@ -95,7 +96,7 @@ function Settings() {
                     <Paragraph type="secondary" style={{ margin: '4px 0 8px' }}>
                       Рекомендуется менять пароль не реже раза в квартал.
                     </Paragraph>
-                    <Button>Сменить пароль</Button>
+                    <Button onClick={() => message.success('Инструкция по смене пароля отправлена на email')}>Сменить пароль</Button>
                   </div>
                   <Divider />
                   <div>
@@ -111,7 +112,7 @@ function Settings() {
                     <Paragraph type="secondary" style={{ margin: '4px 0 8px' }}>
                       Время жизни сессии и выход со всех устройств.
                     </Paragraph>
-                    <Button size="small">Завершить все сессии кроме текущей</Button>
+                    <Button size="small" onClick={() => message.success('Остальные сессии завершены')}>Завершить все сессии кроме текущей</Button>
                   </div>
                 </Space>
               </Card>
@@ -138,7 +139,7 @@ function Settings() {
                   <Paragraph type="secondary">
                     События: новые поручения, истекающие сроки, поступление документов из суда.
                   </Paragraph>
-                  <Button type="primary">Сохранить</Button>
+                  <Button type="primary" onClick={() => message.success('Настройки уведомлений сохранены')}>Сохранить</Button>
                 </Space>
               </Card>
             ),
@@ -178,7 +179,7 @@ function Settings() {
                   <Paragraph type="secondary">
                     1С, банки, мессенджеры настраиваются в соответствующих разделах (Финансы, Omnichannel).
                   </Paragraph>
-                  <Button type="primary">Сохранить</Button>
+                  <Button type="primary" onClick={() => message.success('Настройки интеграций сохранены')}>Сохранить</Button>
                 </Space>
               </Card>
             ),
@@ -205,7 +206,7 @@ function Settings() {
                       <Option value="other">Другой</Option>
                     </Select>
                   </Form.Item>
-                  <Button type="primary">Сохранить</Button>
+                  <Button type="primary" onClick={() => message.success('Настройки документов сохранены')}>Сохранить</Button>
                 </Form>
               </Card>
             ),
@@ -232,7 +233,7 @@ function Settings() {
                       <Option value="dark">Тёмная</Option>
                     </Select>
                   </Form.Item>
-                  <Button type="primary">Сохранить</Button>
+                  <Button type="primary" onClick={() => message.success('Настройки внешнего вида сохранены')}>Сохранить</Button>
                 </Form>
               </Card>
             ),

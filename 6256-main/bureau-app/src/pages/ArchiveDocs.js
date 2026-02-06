@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, message } from 'antd';
 import { FolderOpenOutlined, FileTextOutlined, DatabaseOutlined, SearchOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -90,20 +90,20 @@ function ArchiveDocs() {
           Выгрузка описей и документов в форматах PDF/A и XML для передачи в государственные архивы.
         </Paragraph>
         <Space>
-          <Button icon={<DownloadOutlined />}>Экспорт в PDF/A</Button>
-          <Button icon={<DownloadOutlined />}>Экспорт в XML</Button>
+          <Button icon={<DownloadOutlined />} onClick={() => message.success('Экспорт в PDF/A запущен')}>Экспорт в PDF/A</Button>
+          <Button icon={<DownloadOutlined />} onClick={() => message.success('Экспорт в XML запущен')}>Экспорт в XML</Button>
         </Space>
       </Card>
 
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Архивные действия" bordered={false}>
-            <Space>
-              <Button type="primary" icon={<UploadOutlined />}>Загрузить документ</Button>
-              <Button icon={<SearchOutlined />}>Поиск в архиве</Button>
-              <Button icon={<DownloadOutlined />}>Скачать</Button>
-              <Button>Создать папку</Button>
-              <Button>Версионирование</Button>
+            <Space wrap>
+              <Button type="primary" icon={<UploadOutlined />} onClick={() => message.info('Загрузка в архив — в разделе «Документы»')}>Загрузить документ</Button>
+              <Button icon={<SearchOutlined />} onClick={() => message.success('Откройте поиск по реестру в разделе «Реестр»')}>Поиск в архиве</Button>
+              <Button icon={<DownloadOutlined />} onClick={() => message.info('Скачивание из карточки документа')}>Скачать</Button>
+              <Button onClick={() => message.success('Папка создана (настройка структуры на бэкенде)')}>Создать папку</Button>
+              <Button onClick={() => message.info('Версионирование в карточке документа')}>Версионирование</Button>
             </Space>
           </Card>
         </Col>

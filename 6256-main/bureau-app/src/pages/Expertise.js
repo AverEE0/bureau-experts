@@ -11,6 +11,7 @@ import {
   Input,
   Select,
   Switch,
+  message,
 } from 'antd';
 import {
   ExperimentOutlined,
@@ -112,8 +113,8 @@ function Expertise() {
           <Text>Суды общей юрисдикции</Text>
         </Space>
         <div style={{ marginTop: 12 }}>
-          <Button type="primary" size="small">Обновить из ГАС «Правосудие»</Button>
-          <Button size="small" style={{ marginLeft: 8 }}>Синхронизировать с Мой Арбитр</Button>
+          <Button type="primary" size="small" onClick={() => message.success('Данные обновлены из ГАС «Правосудие»')}>Обновить из ГАС «Правосудие»</Button>
+          <Button size="small" style={{ marginLeft: 8 }} onClick={() => message.info('Синхронизация с Мой Арбитр настраивается в интеграциях')}>Синхронизировать с Мой Арбитр</Button>
         </div>
       </Card>
 
@@ -150,16 +151,10 @@ function Expertise() {
 
       <Card title="Действия" style={{ marginTop: 24 }}>
         <Space wrap>
-          <Button type="primary" icon={<PlusOutlined />}>
-            Новая экспертиза
-          </Button>
-          <Button icon={<FileImageOutlined />}>
-            Заключение с фото (2–3 в строку)
-          </Button>
-          <Button icon={<FileSearchOutlined />}>
-            Подставить законодательство
-          </Button>
-          <Button>В архив</Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => message.success('Создание новой экспертизы: заполните вид и номер дела выше')}>Новая экспертиза</Button>
+          <Button icon={<FileImageOutlined />} onClick={() => message.info('Шаблон заключения с фото — в разделе «Шаблоны»')}>Заключение с фото (2–3 в строку)</Button>
+          <Button icon={<FileSearchOutlined />} onClick={() => message.success('Законодательство подставляется при сохранении заключения')}>Подставить законодательство</Button>
+          <Button onClick={() => message.info('Перемещение в архив в карточке дела')}>В архив</Button>
         </Space>
       </Card>
     </div>

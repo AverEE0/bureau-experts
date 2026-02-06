@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, message } from 'antd';
 import { FileProtectOutlined, KeyOutlined, CheckCircleOutlined, LockOutlined, PlusOutlined, UploadOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -70,22 +70,12 @@ function Signatures() {
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Управление подписями" bordered={false}>
-            <Space>
-              <Button type="primary" icon={<PlusOutlined />}>
-                Создать сертификат
-              </Button>
-              <Button icon={<UploadOutlined />}>
-                Загрузить документ
-              </Button>
-              <Button icon={<FileProtectOutlined />}>
-                Подписать
-              </Button>
-              <Button icon={<EyeOutlined />}>
-                Проверить подпись
-              </Button>
-              <Button>
-                История подписей
-              </Button>
+            <Space wrap>
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => message.info('Мастер создания сертификата (настраивается через УЦ)')}>Создать сертификат</Button>
+              <Button icon={<UploadOutlined />} onClick={() => message.info('Выберите документ для загрузки в разделе «Документы»')}>Загрузить документ</Button>
+              <Button icon={<FileProtectOutlined />} onClick={() => message.info('Выберите документ и нажмите «Подписать» в карточке документа')}>Подписать</Button>
+              <Button icon={<EyeOutlined />} onClick={() => message.success('Проверка подписи: модуль доступен в карточке документа')}>Проверить подпись</Button>
+              <Button onClick={() => message.info('История подписей отображается в отчётах')}>История подписей</Button>
             </Space>
           </Card>
         </Col>

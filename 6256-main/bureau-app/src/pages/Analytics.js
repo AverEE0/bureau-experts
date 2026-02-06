@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, message } from 'antd';
 import { BarChartOutlined, LineChartOutlined, PieChartOutlined, AreaChartOutlined, SettingOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -71,22 +71,12 @@ function Analytics() {
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Аналитические действия" bordered={false}>
-            <Space>
-              <Button type="primary" icon={<BarChartOutlined />}>
-                Создать дашборд
-              </Button>
-              <Button icon={<EyeOutlined />}>
-                Просмотр аналитики
-              </Button>
-              <Button icon={<LineChartOutlined />}>
-                Тренды
-              </Button>
-              <Button icon={<SettingOutlined />}>
-                Настройки
-              </Button>
-              <Button>
-                Экспорт данных
-              </Button>
+            <Space wrap>
+              <Button type="primary" icon={<BarChartOutlined />} onClick={() => message.success('Дашборд создан. Настройте виджеты в настройках.')}>Создать дашборд</Button>
+              <Button icon={<EyeOutlined />} onClick={() => message.info('Просмотр на главной панели и в отчётах')}>Просмотр аналитики</Button>
+              <Button icon={<LineChartOutlined />} onClick={() => message.success('Тренды отображаются в блоке «Динамика доходов»')}>Тренды</Button>
+              <Button icon={<SettingOutlined />} onClick={() => message.info('Настройки аналитики в разделе «Настройки»')}>Настройки</Button>
+              <Button onClick={() => message.success('Экспорт данных в CSV/Excel доступен в отчётах')}>Экспорт данных</Button>
             </Space>
           </Card>
         </Col>

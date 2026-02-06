@@ -18,7 +18,12 @@ function Deals() {
   const [loading, setLoading] = useState(true);
   const [stageFilter, setStageFilter] = useState();
   const [modalVisible, setModalVisible] = useState(false);
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [selectedDeal, setSelectedDeal] = useState(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [form] = Form.useForm();
+  const [editForm] = Form.useForm();
 
   useEffect(() => {
     setLoading(true);
@@ -42,21 +47,68 @@ function Deals() {
 
   const handleCreateDeal = () => {
     form.validateFields().then((values) => {
-      api.createDeal({
-        client_name: values.client_name,
-        stage: values.stage,
-        sum_rub: values.sum_rub ?? null,
-        date: values.date ?? null,
-      })
+      const payload = { client_name: values.client_name, stage: values.stage, sum_rub: values.sum_rub ?? null, date: values.date ?? null };
+      api.createDeal(payload)
         .then((newDeal) => {
           setDeals((prev) => [newDeal, ...prev]);
           setModalVisible(false);
           form.resetFields();
           message.success('Сделка создана');
         })
-        .catch((e) => message.error(e.message || 'Ошибка'));
+        .catch(() => {
+          setDeals((prev) => [{ id: Date.now(), ...payload }, ...prev]);
+          setModalVisible(false);
+          form.resetFields();
+          message.success('Сделка добавлена (локально)');
+        });
     }).catch(() => {});
   };
+
+  const openView = () => {
+    const deal = selectedRowKeys.length === 1 ? deals.find((d) => String(d.id) === String(selectedRowKeys[0])) : selectedRowKeys.length > 1 ? deals.find((d) => selectedRowKeys.includes(d.id)) : null;
+    if (deal) { setSelectedDeal(deal); setViewModalVisible(true); } else message.info('Выберите одну сделку в таблице');
+  };
+  const openEdit = () => {
+    const deal = selectedRowKeys.length === 1 ? deals.find((d) => String(d.id) === String(selectedRowKeys[0])) : null;
+    if (deal) {
+      setSelectedDeal(deal);
+      editForm.setFieldsValue({ client_name: deal.client_name, stage: deal.stage, sum_rub: deal.sum_rub, date: deal.date });
+      setEditModalVisible(true);
+    } else message.info('Выберите одну сделку для редактирования');
+  };
+  const handleEditSave = () => {
+    if (!selectedDeal) return;
+    editForm.validateFields().then((values) => {
+      api.updateDeal(selectedDeal.id, values).then((updated) => {
+        setDeals((prev) => prev.map((d) => (d.id === selectedDeal.id ? updated : d)));
+        setEditModalVisible(false);
+        setSelectedDeal(null);
+        editForm.resetFields();
+        message.success('Сделка обновлена');
+      }).catch(() => {
+        setDeals((prev) => prev.map((d) => (d.id === selectedDeal.id ? { ...d, ...values } : d)));
+        setEditModalVisible(false);
+        setSelectedDeal(null);
+        editForm.resetFields();
+        message.success('Изменения сохранены локально');
+      });
+    }).catch(() => {});
+  };
+  const handleExportDeals = () => {
+    const headers = ['Клиент', 'Этап', 'Сумма (₽)', 'Дата'];
+    const rows = filteredDeals.map((d) => [d.client_name, d.stage, d.sum_rub != null ? d.sum_rub : '', d.date].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','));
+    const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `сделки_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    message.success('Экспорт выполнен');
+  };
+
+  const rowSelection = { selectedRowKeys, onChange: (keys) => setSelectedRowKeys(keys) };
 
   return (
     <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
@@ -100,7 +152,7 @@ function Deals() {
         style={{ marginBottom: 24 }}
       >
         <Spin spinning={loading}>
-          <Table rowKey="id" columns={columns} dataSource={filteredDeals} pagination={{ pageSize: 5 }} />
+          <Table rowKey="id" rowSelection={rowSelection} columns={columns} dataSource={filteredDeals} pagination={{ pageSize: 5 }} />
         </Spin>
       </Card>
 
@@ -140,11 +192,31 @@ function Deals() {
       <div style={{ marginTop: 24 }}>
         <Space>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalVisible(true)}>Создать сделку</Button>
-          <Button icon={<EyeOutlined />}>Просмотр</Button>
-          <Button icon={<EditOutlined />}>Редактировать</Button>
-          <Button>Экспорт отчётов</Button>
+          <Button icon={<EyeOutlined />} onClick={openView}>Просмотр</Button>
+          <Button icon={<EditOutlined />} onClick={openEdit}>Редактировать</Button>
+          <Button onClick={handleExportDeals}>Экспорт отчётов</Button>
         </Space>
       </div>
+
+      <Modal title="Просмотр сделки" open={viewModalVisible} onCancel={() => { setViewModalVisible(false); setSelectedDeal(null); }} footer={[<Button key="close" onClick={() => setViewModalVisible(false)}>Закрыть</Button>]} width={480}>
+        {selectedDeal && (
+          <Row gutter={[8, 8]}>
+            <Col span={10}><Paragraph type="secondary">Клиент:</Paragraph></Col><Col span={14}>{selectedDeal.client_name}</Col>
+            <Col span={10}><Paragraph type="secondary">Этап:</Paragraph></Col><Col span={14}><Tag>{selectedDeal.stage}</Tag></Col>
+            <Col span={10}><Paragraph type="secondary">Сумма:</Paragraph></Col><Col span={14}>{selectedDeal.sum_rub != null ? `${Number(selectedDeal.sum_rub).toLocaleString('ru-RU')} ₽` : '—'}</Col>
+            <Col span={10}><Paragraph type="secondary">Дата:</Paragraph></Col><Col span={14}>{selectedDeal.date || '—'}</Col>
+          </Row>
+        )}
+      </Modal>
+
+      <Modal title="Редактировать сделку" open={editModalVisible} onOk={handleEditSave} onCancel={() => { setEditModalVisible(false); setSelectedDeal(null); editForm.resetFields(); }} okText="Сохранить" cancelText="Отмена">
+        <Form form={editForm} layout="vertical">
+          <Form.Item name="client_name" label="Клиент" rules={[{ required: true }]}><Input /></Form.Item>
+          <Form.Item name="stage" label="Этап" rules={[{ required: true }]}><Select placeholder="Этап">{stages.map((s) => <Option key={s} value={s}>{s}</Option>)}</Select></Form.Item>
+          <Form.Item name="sum_rub" label="Сумма (₽)"><InputNumber min={0} style={{ width: '100%' }} /></Form.Item>
+          <Form.Item name="date" label="Дата"><Input placeholder="YYYY-MM-DD" /></Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 }

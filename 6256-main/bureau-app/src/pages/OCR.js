@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space, Upload } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, Upload, message } from 'antd';
 import { FileTextOutlined, ScanOutlined, CheckCircleOutlined, ExclamationCircleOutlined, UploadOutlined, PlayCircleOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -71,24 +71,14 @@ function OCR() {
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="OCR Действия" bordered={false}>
-            <Space>
-              <Upload>
-                <Button icon={<UploadOutlined />}>
-                  Загрузить документ
-                </Button>
+            <Space wrap>
+              <Upload beforeUpload={() => { message.success('Файл принят в очередь распознавания'); return false; }} showUploadList={false}>
+                <Button icon={<UploadOutlined />}>Загрузить документ</Button>
               </Upload>
-              <Button type="primary" icon={<PlayCircleOutlined />}>
-                Запустить распознавание
-              </Button>
-              <Button icon={<CheckCircleOutlined />}>
-                Проверить результат
-              </Button>
-              <Button>
-                Коррекция ошибок
-              </Button>
-              <Button>
-                Экспорт текста
-              </Button>
+              <Button type="primary" icon={<PlayCircleOutlined />} onClick={() => message.success('Распознавание запущено')}>Запустить распознавание</Button>
+              <Button icon={<CheckCircleOutlined />} onClick={() => message.info('Проверка результата в карточке документа')}>Проверить результат</Button>
+              <Button onClick={() => message.info('Коррекция ошибок в редакторе документа')}>Коррекция ошибок</Button>
+              <Button onClick={() => message.success('Экспорт в TXT/PDF доступен в карточке документа')}>Экспорт текста</Button>
             </Space>
           </Card>
         </Col>

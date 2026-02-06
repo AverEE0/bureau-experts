@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space } from 'antd';
+import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space, message } from 'antd';
 import { DollarOutlined, BarChartOutlined, PieChartOutlined, DownloadOutlined, EyeOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -65,22 +65,12 @@ function FinancialReports() {
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Финансовые отчеты" bordered={false}>
-            <Space>
-              <Button type="primary" icon={<BarChartOutlined />}>
-                Сформировать отчет
-              </Button>
-              <Button icon={<EyeOutlined />}>
-                Просмотр отчетов
-              </Button>
-              <Button icon={<DownloadOutlined />}>
-                Экспорт
-              </Button>
-              <Button>
-                Бюджетирование
-              </Button>
-              <Button>
-                Анализ
-              </Button>
+            <Space wrap>
+              <Button type="primary" icon={<BarChartOutlined />} onClick={() => message.success('Отчёт формируется. Доступен в списке отчётов.')}>Сформировать отчет</Button>
+              <Button icon={<EyeOutlined />} onClick={() => message.info('Список отчётов и просмотр — в разделе «Операционные отчёты»')}>Просмотр отчетов</Button>
+              <Button icon={<DownloadOutlined />} onClick={() => message.success('Экспорт в Excel/PDF доступен в карточке отчёта')}>Экспорт</Button>
+              <Button onClick={() => message.info('Бюджетирование настраивается в разделе «Настройки»')}>Бюджетирование</Button>
+              <Button onClick={() => message.success('Аналитика в разделе «Аналитика»')}>Анализ</Button>
             </Space>
           </Card>
         </Col>
