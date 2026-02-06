@@ -178,13 +178,12 @@ a:hover,
 .header-tricolor span:nth-child(2) { flex: 0 0 33.33%; }
 .header-tricolor span:last-child { flex: 0 0 33.34%; }
 
-/* Шапка — прикреплена сверху как рамка окна, белый фон */
+/* Шапка — прикреплена сверху, одна строка без разделения с контентом */
 .app-header-wrap {
   position: sticky;
   top: 0;
   z-index: 100;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* Контент — отступ снизу, чтобы не уходить под фиксированный футер */

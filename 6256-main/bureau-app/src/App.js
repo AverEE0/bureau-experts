@@ -430,7 +430,6 @@ function App() {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
             }}
           >
             <div style={{ width: 120, display: 'flex', alignItems: 'center' }}>
@@ -451,11 +450,6 @@ function App() {
               <Avatar size="large" icon={<UserOutlined />} style={{ backgroundColor: '#333' }} />
             </Space>
           </Header>
-          <div className="header-tricolor" aria-hidden="true">
-            <span style={{ background: '#fff', width: '33.33%' }} />
-            <span style={{ background: '#0039a6' }} />
-            <span style={{ background: '#d52b1e' }} />
-          </div>
         </div>
         <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
           <div className="app-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>{renderContent()}</div>
