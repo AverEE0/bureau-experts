@@ -1,40 +1,16 @@
-# Как включить GitHub Pages (чтобы сайт открывался по ссылке)
+# Включение GitHub Pages (чтобы сайт открывался, а не 404)
 
-Сейчас настроен деплой через **ветку gh-pages**. Сделайте три шага:
+Если при открытии **https://averee0.github.io/bureau-experts/** вы видите **404 File not found**:
 
----
+1. Откройте репозиторий на GitHub: **https://github.com/AverEE0/bureau-experts**
+2. Перейдите в **Settings** → **Pages** (в левом меню).
+3. В блоке **Build and deployment**:
+   - **Source:** выберите **Deploy from a branch** (не "GitHub Actions" для источника — сам деплой уже через Actions).
+   - **Branch:** выберите **gh-pages** (не main).
+   - **Folder:** выберите **/ (root)**.
+4. Нажмите **Save**.
 
-## Шаг 1. Запустить workflow вручную (один раз)
-
-1. Откройте: **https://github.com/AverEE0/bureau-experts/actions**
-2. Слева выберите workflow **"Build and deploy to gh-pages"**.
-3. Справа нажмите **"Run workflow"** → **"Run workflow"**.
-4. Подождите 1–2 минуты, пока зелёная галочка не появится (успех).
-
-Так создастся ветка **gh-pages** с собранным сайтом.
-
----
-
-## Шаг 2. Включить GitHub Pages в настройках
-
-1. Откройте: **https://github.com/AverEE0/bureau-experts/settings/pages**
-2. В блоке **"Build and deployment"**:
-   - **Source:** выберите **"Deploy from a branch"**.
-   - **Branch:** выберите **gh-pages** и папку **/ (root)**.
-3. Нажмите **Save**.
-
----
-
-## Шаг 3. Подождать 1–2 минуты
-
-Через минуту сайт должен открыться по адресу:
-
+Через 1–2 минуты сайт должен открываться по адресу:  
 **https://averee0.github.io/bureau-experts/**
 
-Если по-прежнему 404 — подождите ещё 2–3 минуты или проверьте в **Settings → Pages**, что выбран источник **Deploy from a branch** и ветка **gh-pages**.
-
----
-
-## Дальше
-
-При каждом новом **push в main** workflow будет автоматически пересобирать сайт и обновлять ветку **gh-pages** — обновление отобразится на сайте через 1–2 минуты.
+Важно: ветка **main** содержит только исходный код (папки 6256-main, .github и т.д.), в ней нет `index.html` в корне. Собранный сайт публикуется в ветку **gh-pages** workflow’ом при каждом push в main.

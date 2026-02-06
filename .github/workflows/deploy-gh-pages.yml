@@ -29,6 +29,10 @@ jobs:
           npm ci
           npm run build
 
+      - name: Prepare for GitHub Pages (SPA)
+        run: |
+          cp 6256-main/bureau-app/build/index.html 6256-main/bureau-app/build/404.html
+
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:

@@ -53,6 +53,19 @@ import Settings from './pages/Settings';
 
 const { Header, Sider, Footer } = Layout;
 
+// Базовый путь для GitHub Pages (например /bureau-experts)
+const getBasePath = () => {
+  try {
+    const url = process.env.PUBLIC_URL || '';
+    if (!url) return '';
+    const path = url.startsWith('http') ? new URL(url).pathname : url;
+    return path.replace(/\/$/, '') || '';
+  } catch {
+    return '';
+  }
+};
+const BASE_PATH = getBasePath();
+
 // Соответствие пути в URL и ключа страницы (только для начальной загрузки)
 const PATH_TO_PAGE = {
   '/': 'dashboard',
@@ -106,14 +119,55 @@ function App() {
 
   // При первой загрузке показывать «Страница не найдена» для неизвестного пути в URL
   useEffect(() => {
-    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    let path = window.location.pathname;
+    if (BASE_PATH && path.startsWith(BASE_PATH)) path = path.slice(BASE_PATH.length);
+    path = path.replace(/\/$/, '') || '/';
     const page = PATH_TO_PAGE[path];
     setCurrentPage(page || 'notfound');
   }, []);
 
+  const PAGE_TO_PATH = {
+    dashboard: '/',
+    'crm-clients': '/crm/clients',
+    'crm-deals': '/crm/deals',
+    'crm-contacts': '/crm/contacts',
+    'crm-history': '/crm/history',
+    documents: '/documents',
+    'documents-ocr': '/documents/ocr',
+    'documents-templates': '/documents/templates',
+    'documents-signatures': '/documents/signatures',
+    'cycles-expertise': '/cycles/expertise',
+    'cycles-valuation': '/cycles/valuation',
+    'cycles-legal': '/cycles/legal',
+    'cycles-realty': '/cycles/realty',
+    'archive-documents': '/archive/documents',
+    'archive-media': '/archive/media',
+    'archive-history': '/archive/history',
+    'archive-reestr': '/archive/reestr',
+    'finance-ofd': '/finance/ofd',
+    'finance-edo': '/finance/edo',
+    'finance-1c': '/finance/1c',
+    'finance-banks': '/finance/banks',
+    'omnichannel-telegram': '/omnichannel/telegram',
+    'omnichannel-max': '/omnichannel/max',
+    'omnichannel-bip': '/omnichannel/bip',
+    'omnichannel-sms': '/omnichannel/sms',
+    'omnichannel-email': '/omnichannel/email',
+    'omnichannel-calls': '/omnichannel/calls',
+    'reports-financial': '/reports/financial',
+    'reports-operational': '/reports/operational',
+    'reports-analytics': '/reports/analytics',
+    settings: '/settings',
+    'internal-chat': '/internal-chat',
+  };
   const handleMenuClick = (e) => {
     setCurrentPage(e.key);
     if (isMobile) setDrawerVisible(false);
+    const path = PAGE_TO_PATH[e.key];
+    if (path !== undefined && window.history.pushState) {
+      const fullPath = BASE_PATH + (path === '/' ? '' : path) || BASE_PATH || '/';
+      window.history.pushState({}, '', fullPath);
+    }
   };
 
   const renderContent = () => {
