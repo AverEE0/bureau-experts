@@ -6,12 +6,26 @@ import { api } from '../api';
 const { Title, Paragraph } = Typography;
 const { Option } = Select;
 
-const defaultDeals = [
-  { id: 1, client_name: 'Иванов Иван Иванович', stage: 'Подписание договора', sum_rub: 45000, date: '2025-02-01' },
-  { id: 2, client_name: 'ООО "Ромашка"', stage: 'Исполнение услуг', sum_rub: 120000, date: '2025-01-28' },
+const STAGES = [
+  'Новый',
+  'В ожидании',
+  'В работе',
+  'Счет',
+  'Оплачен',
+  'Не оплачен',
+  'Осмотр',
+  'Направлен в суд',
+  'Направлен нотариусу',
+  'Акт',
+  'Завершен',
 ];
 
-const stages = ['Входящие запросы', 'Первичная консультация', 'Подготовка предложения', 'Согласование условий', 'Подписание договора', 'Исполнение услуг', 'Закрытие сделки'];
+const defaultDeals = [
+  { id: 1, client_name: 'Иванов Иван Иванович', stage: 'В работе', sum_rub: 45000, date: '2025-02-01' },
+  { id: 2, client_name: 'ООО "Ромашка"', stage: 'Акт', sum_rub: 120000, date: '2025-01-28' },
+];
+
+const stages = STAGES;
 
 function Deals() {
   const [deals, setDeals] = useState(defaultDeals);

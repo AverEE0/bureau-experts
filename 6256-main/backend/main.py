@@ -22,8 +22,8 @@ def seed_if_empty():
             db.commit()
         if db.query(Deal).count() == 0:
             for d in [
-                {"client_name": "Иванов Иван Иванович", "stage": "Подписание договора", "sum_rub": 45000.0, "date": "2025-02-01"},
-                {"client_name": 'ООО "Ромашка"', "stage": "Исполнение услуг", "sum_rub": 120000.0, "date": "2025-01-28"},
+                {"client_name": "Иванов Иван Иванович", "stage": "В работе", "sum_rub": 45000.0, "date": "2025-02-01"},
+                {"client_name": 'ООО "Ромашка"', "stage": "Акт", "sum_rub": 120000.0, "date": "2025-01-28"},
             ]:
                 db.add(Deal(**d))
             db.commit()
