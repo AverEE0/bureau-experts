@@ -2,9 +2,6 @@
 
 ## Если сайт даёт 404
 
-Сайт публикуется в ветку **gh-pages** при каждом push в `main`.  
-Чтобы он открывался по адресу **https://averee0.github.io/bureau-experts/**:
-
-**Settings** → **Pages** → **Source:** Deploy from a branch → **Branch:** **gh-pages** → **Folder:** / (root) → Save.
+В **Settings** → **Pages** выберите источник **GitHub Actions** (не ветку). Тогда при push в `main` workflow сам задеплоит сайт.
 
 Подробнее: [ВКЛЮЧИТЬ_GITHUB_PAGES.md](./ВКЛЮЧИТЬ_GITHUB_PAGES.md)
