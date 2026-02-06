@@ -420,7 +420,7 @@ function App() {
         </Menu>
       </Drawer>
       <Layout className="app-shell" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-        <div style={{ flex: '0 0 auto' }}>
+        <div className="app-header-wrap" style={{ flex: '0 0 auto' }}>
           <Header
             className="app-header"
             style={{
@@ -463,19 +463,19 @@ function App() {
           </div>
         </div>
         <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <div style={{ flex: 1, minHeight: 0 }}>{renderContent()}</div>
-          <Footer className="app-footer">
-            <div className="footer-tricolor" aria-hidden="true">
-              <span style={{ background: '#fff' }} />
-              <span style={{ background: '#0039a6' }} />
-              <span style={{ background: '#d52b1e' }} />
-            </div>
-            <div className="app-footer-text">
-              <strong>{ORG_NAME}</strong> — © 2026. Все права защищены. Соответствует ФЗ-152, ФЗ-73, ФЗ-135.
-            </div>
-          </Footer>
+          <div className="app-content" style={{ flex: 1, minHeight: 0 }}>{renderContent()}</div>
         </div>
       </Layout>
+      <Footer className="app-footer">
+        <div className="footer-tricolor" aria-hidden="true">
+          <span style={{ background: '#fff' }} />
+          <span style={{ background: '#0039a6' }} />
+          <span style={{ background: '#d52b1e' }} />
+        </div>
+        <div className="app-footer-text">
+          <strong>{ORG_NAME}</strong> — © 2026. Все права защищены. Соответствует ФЗ-152, ФЗ-73, ФЗ-135.
+        </div>
+      </Footer>
       <Drawer
         title="Меню"
         placement="left"
