@@ -11,10 +11,29 @@ import {
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
-const Dashboard = () => {
+const Dashboard = ({ onNavigate }) => {
+  const quickLinks = [
+    { key: 'crm-clients', label: 'Клиенты', icon: <TeamOutlined /> },
+    { key: 'documents', label: 'Документы', icon: <FileTextOutlined /> },
+    { key: 'cycles-expertise', label: 'Экспертиза', icon: <FileTextOutlined /> },
+    { key: 'cycles-valuation', label: 'Оценка', icon: <FileTextOutlined /> },
+    { key: 'archive-reestr', label: 'Реестр', icon: <FileTextOutlined /> },
+    { key: 'documents-templates', label: 'Шаблоны', icon: <FileTextOutlined /> },
+  ];
+
   return (
     <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Главная панель управления</Title>
+      {onNavigate && (
+        <Card size="small" style={{ marginBottom: 24 }}>
+          <Text type="secondary" style={{ marginRight: 8 }}>Быстрые переходы:</Text>
+          <Space wrap>
+            {quickLinks.map(({ key, label, icon }) => (
+              <Button key={key} size="small" icon={icon} onClick={() => onNavigate(key)}>{label}</Button>
+            ))}
+          </Space>
+        </Card>
+      )}
       <Row gutter={24}>
         <Col span={6}>
           <Card>

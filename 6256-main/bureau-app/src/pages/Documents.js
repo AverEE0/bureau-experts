@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Layout,
   Card,
@@ -11,82 +11,62 @@ import {
   Table,
   Tag,
   Select,
+  message,
+  Spin,
 } from 'antd';
 import { UploadOutlined, FileTextOutlined, ScanOutlined } from '@ant-design/icons';
+import { api } from '../api';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-const initialDocs = [
-  {
-    id: '1',
-    filename: 'Договор №15-ЭО.pdf',
-    type: 'Договор',
-    client: 'ООО "Ромашка"',
-    status: 'Распознан',
-    createdAt: '12.01.2026',
-  },
-  {
-    id: '2',
-    filename: 'Отчет_оценка_квартира_Иванов.pdf',
-    type: 'Отчет об оценке',
-    client: 'Иванов Иван Иванович',
-    status: 'Классифицирован',
-    createdAt: '10.01.2026',
-  },
-  {
-    id: '3',
-    filename: 'Заключение_судебного_эксперта_дело_4573.pdf',
-    type: 'Заключение судебного эксперта',
-    client: 'Арбитражный суд',
-    status: 'В обработке',
-    createdAt: '08.01.2026',
-  },
+const defaultDocs = [
+  { id: 1, name: 'Договор №15-ЭО.pdf', doc_type: 'Договор', created_at: '2026-01-12T10:00:00' },
+  { id: 2, name: 'Отчет_оценка_квартира_Иванов.pdf', doc_type: 'Отчет об оценке', created_at: '2026-01-10T10:00:00' },
 ];
 
+const formatDate = (v) => (v ? new Date(v).toLocaleDateString('ru-RU') : '—');
+
 const Documents = () => {
-  const [docs, setDocs] = useState(initialDocs);
+  const [docs, setDocs] = useState(defaultDocs);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
   const [uploadingType, setUploadingType] = useState('Договор');
 
-  const handleBeforeUpload = (file) => {
-    const newDoc = {
-      id: String(Date.now()),
-      filename: file.name,
-      type: uploadingType,
-      client: 'Не назначен',
-      status: 'Загружен',
-      createdAt: new Date().toLocaleDateString('ru-RU'),
-    };
-    setDocs((prev) => [newDoc, ...prev]);
-    return false; // не отправляем файл на сервер
+  useEffect(() => {
+    setLoading(true);
+    api.getDocuments()
+      .then((data) => setDocs(Array.isArray(data) ? data : []))
+      .catch(() => {
+        message.warning('Бэкенд недоступен. Показаны локальные данные.');
+        setDocs(defaultDocs);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleUpload = async (file) => {
+    setUploading(true);
+    try {
+      const newDoc = await api.uploadDocument(file, uploadingType);
+      setDocs((prev) => [newDoc, ...prev]);
+      message.success('Документ загружен');
+    } catch (e) {
+      message.error(e.message || 'Ошибка загрузки');
+    } finally {
+      setUploading(false);
+    }
+    return false; // prevent default upload
   };
 
-  const handleClassifyAll = () => {
-    setDocs((prev) =>
-      prev.map((d) =>
-        d.status === 'Загружен'
-          ? { ...d, status: 'Классифицирован' }
-          : d,
-      ),
-    );
-  };
-
-  const handleOcrAll = () => {
-    setDocs((prev) =>
-      prev.map((d) =>
-        d.status === 'Классифицирован'
-          ? { ...d, status: 'Распознан' }
-          : d,
-      ),
-    );
-  };
+  const handleClassifyAll = () => message.info('Классификация выполняется на бэкенде (заглушка)');
+  const handleOcrAll = () => message.info('OCR выполняется на бэкенде (заглушка)');
 
   const columns = [
     {
       title: 'Файл',
-      dataIndex: 'filename',
-      key: 'filename',
+      dataIndex: 'name',
+      key: 'name',
       render: (value) => (
         <Space>
           <FileTextOutlined />
@@ -94,34 +74,9 @@ const Documents = () => {
         </Space>
       ),
     },
-    {
-      title: 'Тип документа',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
-      title: 'Клиент / дело',
-      dataIndex: 'client',
-      key: 'client',
-    },
-    {
-      title: 'Статус',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        let color = '#333333';
-        if (status === 'Загружен') color = '#777777';
-        if (status === 'Классифицирован') color = '#a48752';
-        if (status === 'Распознан') color = '#28a745';
-        if (status === 'В обработке') color = '#a48752';
-        return <Tag color={color}>{status}</Tag>;
-      },
-    },
-    {
-      title: 'Создан',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-    },
+    { title: 'Тип документа', dataIndex: 'doc_type', key: 'doc_type' },
+    { title: 'Примечание', dataIndex: 'note', key: 'note', render: (v) => v || '—' },
+    { title: 'Загружен', dataIndex: 'created_at', key: 'created_at', render: formatDate },
   ];
 
   return (
@@ -147,8 +102,8 @@ const Documents = () => {
             style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
           >
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Upload beforeUpload={handleBeforeUpload} showUploadList={false}>
-                <Button icon={<UploadOutlined />}>Выбрать файл</Button>
+              <Upload beforeUpload={handleUpload} showUploadList={false} disabled={uploading}>
+                <Button icon={<UploadOutlined />} loading={uploading}>Выбрать файл и загрузить</Button>
               </Upload>
               <Text type="secondary">Поддержка: PDF, JPG, PNG</Text>
               <div>
@@ -241,12 +196,14 @@ const Documents = () => {
       </Card>
 
       <Card title="Журнал документов">
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={docs}
-          pagination={{ pageSize: 10, showSizeChanger: false }}
-        />
+        <Spin spinning={loading}>
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={docs}
+            pagination={{ pageSize: 10, showSizeChanger: false }}
+          />
+        </Spin>
       </Card>
     </Content>
   );

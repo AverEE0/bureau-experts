@@ -6,7 +6,7 @@ const { Title, Paragraph } = Typography;
 
 function Legal() {
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Юридические Услуги</Title>
       <Paragraph>
         Комплексное юридическое сопровождение экспертной деятельности. Консультации, договоры, судебная защита.
@@ -68,25 +68,44 @@ function Legal() {
         </Col>
       </Row>
 
+      <Card title="Шаблоны ГПК / АПК / КоАП" style={{ marginTop: 24 }} bordered={false}>
+        <Paragraph type="secondary">
+          Шаблоны по Гражданскому процессуальному кодексу (ГПК), Арбитражному процессуальному кодексу (АПК), Кодексу об административных правонарушениях (КоАП) — исковые заявления, ходатайства, отводы, жалобы для судебного сопровождения экспертной деятельности.
+        </Paragraph>
+        <Space wrap>
+          <Button size="small">Исковое заявление (ГПК)</Button>
+          <Button size="small">Исковое заявление (АПК)</Button>
+          <Button size="small">Ходатайство</Button>
+          <Button size="small">Жалоба (КоАП)</Button>
+        </Space>
+      </Card>
+
+      <Card title="Календарь сроков" style={{ marginTop: 16 }} bordered={false}>
+        <List
+          size="small"
+          dataSource={[
+            { date: '15.02.2026', desc: 'Подача отзыва на иск по делу № 2-1234/2025', type: 'Суд' },
+            { date: '20.02.2026', desc: 'Истечение срока представления заключения эксперта', type: 'Экспертиза' },
+            { date: '28.02.2026', desc: 'Оплата госпошлины по апелляции', type: 'Платежи' },
+          ]}
+          renderItem={(item) => (
+            <List.Item>
+              <Tag color="#333">{item.date}</Tag> [{item.type}] {item.desc}
+            </List.Item>
+          )}
+        />
+        <Button type="primary" size="small" style={{ marginTop: 8 }}>Добавить срок</Button>
+      </Card>
+
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Юридические действия" bordered={false}>
             <Space>
-              <Button type="primary" icon={<PlusOutlined />}>
-                Новое дело
-              </Button>
-              <Button icon={<FileTextOutlined />}>
-                Создать договор
-              </Button>
-              <Button icon={<AuditOutlined />}>
-                Судебное дело
-              </Button>
-              <Button icon={<EyeOutlined />}>
-                Просмотр дел
-              </Button>
-              <Button icon={<FileProtectOutlined />}>
-                Консультация
-              </Button>
+              <Button type="primary" icon={<PlusOutlined />}>Новое дело</Button>
+              <Button icon={<FileTextOutlined />}>Создать договор</Button>
+              <Button icon={<AuditOutlined />}>Судебное дело</Button>
+              <Button icon={<EyeOutlined />}>Просмотр дел</Button>
+              <Button icon={<FileProtectOutlined />}>Консультация</Button>
             </Space>
           </Card>
         </Col>

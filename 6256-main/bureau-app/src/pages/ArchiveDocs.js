@@ -6,10 +6,10 @@ const { Title, Paragraph } = Typography;
 
 function ArchiveDocs() {
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
-      <Title level={2}>Архив Документов</Title>
+    <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+      <Title level={2}>Архив документов</Title>
       <Paragraph>
-        Централизованное хранение и управление документами. Быстрый поиск, версионирование, безопасность данных.
+        Централизованное хранение, поиск, версионирование. Соответствие ФЗ-125 и Приказа Минкультуры №558. Зашифрованное хранилище (при подключённом backend).
       </Paragraph>
 
       <Row gutter={16} style={{ marginBottom: 24 }}>
@@ -68,25 +68,42 @@ function ArchiveDocs() {
         </Col>
       </Row>
 
+      <Card title="Сроки хранения по типам документов" style={{ marginTop: 24 }} bordered={false}>
+        <List
+          size="small"
+          dataSource={[
+            { type: 'Заключения судебных экспертов, отчёты об оценке', term: '75 лет' },
+            { type: 'Договоры, акты выполненных работ', term: '10 лет' },
+            { type: 'Счета, первичные бухгалтерские документы', term: '5–10 лет' },
+            { type: 'Кадровые документы', term: '3 года (и более по номенклатуре)' },
+          ]}
+          renderItem={(item) => (
+            <List.Item>
+              <span>{item.type}</span> — <strong>{item.term}</strong>
+            </List.Item>
+          )}
+        />
+      </Card>
+
+      <Card title="Экспорт для госархивов" style={{ marginTop: 16 }} bordered={false}>
+        <Paragraph type="secondary">
+          Выгрузка описей и документов в форматах PDF/A и XML для передачи в государственные архивы.
+        </Paragraph>
+        <Space>
+          <Button icon={<DownloadOutlined />}>Экспорт в PDF/A</Button>
+          <Button icon={<DownloadOutlined />}>Экспорт в XML</Button>
+        </Space>
+      </Card>
+
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
           <Card title="Архивные действия" bordered={false}>
             <Space>
-              <Button type="primary" icon={<UploadOutlined />}>
-                Загрузить документ
-              </Button>
-              <Button icon={<SearchOutlined />}>
-                Поиск в архиве
-              </Button>
-              <Button icon={<DownloadOutlined />}>
-                Скачать
-              </Button>
-              <Button>
-                Создать папку
-              </Button>
-              <Button>
-                Версионирование
-              </Button>
+              <Button type="primary" icon={<UploadOutlined />}>Загрузить документ</Button>
+              <Button icon={<SearchOutlined />}>Поиск в архиве</Button>
+              <Button icon={<DownloadOutlined />}>Скачать</Button>
+              <Button>Создать папку</Button>
+              <Button>Версионирование</Button>
             </Space>
           </Card>
         </Col>

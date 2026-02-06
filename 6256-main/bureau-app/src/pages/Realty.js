@@ -6,7 +6,7 @@ const { Title, Paragraph } = Typography;
 
 function Realty() {
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Недвижимость</Title>
       <Paragraph>
         Экспертиза и оценка объектов недвижимости. Техническое обследование, оценка стоимости, юридическая проверка.
@@ -68,25 +68,37 @@ function Realty() {
         </Col>
       </Row>
 
+      <Card title="Парсинг площадок объявлений" style={{ marginTop: 24 }} bordered={false}>
+        <Paragraph type="secondary">
+          Сбор данных об аналогах и предложениях с площадок: Авито, ЦИАН, Яндекс.Недвижимость, VK (объявления) — для отчётов об оценке и анализа рынка.
+        </Paragraph>
+        <Space wrap>
+          <Button size="small">Авито</Button>
+          <Button size="small">ЦИАН</Button>
+          <Button size="small">Яндекс.Недвижимость</Button>
+          <Button size="small">VK</Button>
+        </Space>
+        <Paragraph type="secondary" style={{ marginTop: 12 }}>
+          Настройка источников и периодичности выгрузки — в настройках интеграций.
+        </Paragraph>
+      </Card>
+
+      <Card title="Интеграция с сайтом бюроэкспертов.рф" style={{ marginTop: 16 }} bordered={false}>
+        <Paragraph type="secondary">
+          Заявки и лиды с сайта бюроэкспертов.рф поступают в CRM; возможность единого реестра заявок на оценку и экспертизу.
+        </Paragraph>
+        <Button type="primary" size="small">Настроить приём заявок</Button>
+      </Card>
+
       <Row style={{ marginTop: 24 }}>
         <Col span={24}>
-          <Card title="Недвижимые действия" bordered={false}>
+          <Card title="Действия" bordered={false}>
             <Space>
-              <Button type="primary" icon={<PlusOutlined />}>
-                Добавить объект
-              </Button>
-              <Button icon={<EyeOutlined />}>
-                Просмотр объектов
-              </Button>
-              <Button icon={<CalculatorOutlined />}>
-                Оценка стоимости
-              </Button>
-              <Button>
-                Экспертиза состояния
-              </Button>
-              <Button>
-                Документы
-              </Button>
+              <Button type="primary" icon={<PlusOutlined />}>Добавить объект</Button>
+              <Button icon={<EyeOutlined />}>Просмотр объектов</Button>
+              <Button icon={<CalculatorOutlined />}>Оценка стоимости</Button>
+              <Button>Экспертиза состояния</Button>
+              <Button>Документы</Button>
             </Space>
           </Card>
         </Col>

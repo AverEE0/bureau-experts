@@ -6,10 +6,10 @@ const { Title, Paragraph } = Typography;
 
 function Signatures() {
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Электронные Подписи</Title>
       <Paragraph>
-        Система электронного подписания документов. Интеграция с УЦ ФНС, обеспечение юридической значимости документов.
+        Электронное подписание документов: КЭП/УКЭП (квалифицированная и усиленная квалифицированная ЭП). Интеграция с КриптоПро, УЦ ФНС и коммерческими УЦ. Юридическая значимость в соответствии с 63-ФЗ.
       </Paragraph>
 
       <Row gutter={16} style={{ marginBottom: 24 }}>

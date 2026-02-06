@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Card,
   Row,
@@ -12,61 +12,51 @@ import {
   Form,
   Input,
   Select,
+  Tabs,
+  List,
+  message,
+  Spin,
 } from 'antd';
-import { PlusOutlined, SearchOutlined, ExportOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined } from '@ant-design/icons';
+import { api } from '../api';
 
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
+const { TabPane } = Tabs;
 
-const initialClients = [
-  {
-    id: '1',
-    name: 'Иванов Иван Иванович',
-    type: 'Физ. лицо',
-    inn: '770512345678',
-    phone: '+7 (900) 111-22-33',
-    email: 'ivanov@example.ru',
-    status: 'Активный',
-    segment: 'VIP',
-    manager: 'Петрова Н.В.',
-  },
-  {
-    id: '2',
-    name: 'ООО "Ромашка"',
-    type: 'Юр. лицо',
-    inn: '7708123456',
-    phone: '+7 (900) 222-33-44',
-    email: 'info@romashka.ru',
-    status: 'Новый',
-    segment: 'Корпоративный',
-    manager: 'Иванов С.А.',
-  },
-  {
-    id: '3',
-    name: 'Петров Петр Петрович',
-    type: 'Физ. лицо',
-    inn: '781012345678',
-    phone: '+7 (900) 333-44-55',
-    email: 'petrov@example.ru',
-    status: 'В работе',
-    segment: 'Частный',
-    manager: 'Сидорова Л.М.',
-  },
+const defaultClients = [
+  { id: 1, name: 'Иванов Иван Иванович', type: 'Физ. лицо', inn: '770512345678', phone: '+7 (900) 111-22-33', email: 'ivanov@example.ru', status: 'Активный', segment: 'VIP', manager: 'Петрова Н.В.' },
+  { id: 2, name: 'ООО "Ромашка"', type: 'Юр. лицо', inn: '7708123456', phone: '+7 (900) 222-33-44', email: 'info@romashka.ru', status: 'Новый', segment: 'Корпоративный', manager: 'Иванов С.А.' },
+  { id: 3, name: 'Петров Петр Петрович', type: 'Физ. лицо', inn: '781012345678', phone: '+7 (900) 333-44-55', email: 'petrov@example.ru', status: 'В работе', segment: 'Частный', manager: 'Сидорова Л.М.' },
 ];
 
 function Clients() {
-  const [clients, setClients] = useState(initialClients);
+  const [clients, setClients] = useState(defaultClients);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState();
   const [modalVisible, setModalVisible] = useState(false);
+  const [cardVisible, setCardVisible] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    setLoading(true);
+    api.getClients(search || undefined, statusFilter)
+      .then((data) => setClients(Array.isArray(data) ? data : []))
+      .catch(() => {
+        message.warning('Бэкенд недоступен. Показаны локальные данные.');
+        setClients(defaultClients);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const filteredClients = useMemo(
     () =>
       clients.filter((c) => {
         const matchesSearch =
           !search ||
-          c.name.toLowerCase().includes(search.toLowerCase()) ||
+          (c.name && c.name.toLowerCase().includes(search.toLowerCase())) ||
           (c.inn && c.inn.includes(search.replace(/\s/g, ''))) ||
           (c.phone && c.phone.includes(search));
         const matchesStatus = !statusFilter || c.status === statusFilter;
@@ -74,6 +64,16 @@ function Clients() {
       }),
     [clients, search, statusFilter],
   );
+
+  const mockContracts = selectedClient ? [
+    { id: 1, num: 'Д-001', date: '15.01.2025', subject: 'Оценка квартиры', sum: '45 000 ₽' },
+    { id: 2, num: 'Д-002', date: '20.02.2025', subject: 'Судебная экспертиза', sum: '78 000 ₽' },
+  ] : [];
+  const mockCommunications = selectedClient ? [
+    { date: '04.02.2026', channel: 'Telegram', text: 'Направлен отчёт об оценке' },
+    { date: '01.02.2026', channel: 'Email', text: 'Договор подписан' },
+    { date: '28.01.2026', channel: 'Телефон', text: 'Согласование даты выезда' },
+  ] : [];
 
   const handleAddClient = () => {
     form
@@ -203,12 +203,18 @@ function Clients() {
           </Space>
         }
       >
+        <Spin spinning={loading}>
         <Table
           rowKey="id"
           columns={columns}
           dataSource={filteredClients}
           pagination={{ pageSize: 8, showSizeChanger: false }}
+          onRow={(record) => ({
+            onClick: () => { setSelectedClient(record); setCardVisible(true); },
+            style: { cursor: 'pointer' },
+          })}
         />
+        </Spin>
       </Card>
 
       <Modal
@@ -270,6 +276,65 @@ function Clients() {
             <Input />
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title={selectedClient ? `Карточка клиента: ${selectedClient.name}` : 'Карточка клиента'}
+        open={cardVisible}
+        onCancel={() => { setCardVisible(false); setSelectedClient(null); }}
+        footer={[<Button key="close" onClick={() => setCardVisible(false)}>Закрыть</Button>]}
+        width={640}
+      >
+        {selectedClient && (
+          <Tabs defaultActiveKey="1">
+            <TabPane tab={<span><UserOutlined /> Общие данные</span>} key="1">
+              <Row gutter={[16, 8]}>
+                <Col span={12}><Text type="secondary">Тип:</Text></Col><Col span={12}>{selectedClient.type}</Col>
+                <Col span={12}><Text type="secondary">ИНН / ОГРН:</Text></Col><Col span={12}>{selectedClient.inn}</Col>
+                <Col span={12}><Text type="secondary">Телефон:</Text></Col><Col span={12}>{selectedClient.phone}</Col>
+                <Col span={12}><Text type="secondary">Email:</Text></Col><Col span={12}>{selectedClient.email}</Col>
+                <Col span={12}><Text type="secondary">Статус:</Text></Col><Col span={12}><Tag color="#a48752">{selectedClient.status}</Tag></Col>
+                <Col span={12}><Text type="secondary">Сегмент:</Text></Col><Col span={12}>{selectedClient.segment}</Col>
+                <Col span={12}><Text type="secondary">Менеджер:</Text></Col><Col span={12}>{selectedClient.manager}</Col>
+              </Row>
+            </TabPane>
+            <TabPane tab={<span><FileTextOutlined /> Договоры</span>} key="2">
+              <List
+                dataSource={mockContracts}
+                renderItem={(item) => (
+                  <List.Item>
+                    <div><Text strong>{item.num}</Text> от {item.date} — {item.subject}</div>
+                    <div><Text type="secondary">{item.sum}</Text></div>
+                  </List.Item>
+                )}
+              />
+              <Text type="secondary">История договоров по клиенту (мок)</Text>
+            </TabPane>
+            <TabPane tab={<span><DollarOutlined /> Платежи</span>} key="3">
+              <List
+                dataSource={[{ id: 1, date: '20.02.2025', sum: '78 000 ₽', doc: 'Счёт № 102' }]}
+                renderItem={(item) => (
+                  <List.Item>
+                    {item.date} — {item.sum} ({item.doc})
+                  </List.Item>
+                )}
+              />
+              <Text type="secondary">Платежи по клиенту (мок)</Text>
+            </TabPane>
+            <TabPane tab={<span><MessageOutlined /> Коммуникации</span>} key="4">
+              <List
+                dataSource={mockCommunications}
+                renderItem={(item) => (
+                  <List.Item>
+                    <div><Tag>{item.channel}</Tag> {item.date}</div>
+                    <div>{item.text}</div>
+                  </List.Item>
+                )}
+              />
+              <Text type="secondary">Лог обращений и сообщений (мок)</Text>
+            </TabPane>
+          </Tabs>
+        )}
       </Modal>
     </div>
   );

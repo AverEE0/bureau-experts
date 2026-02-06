@@ -6,7 +6,7 @@ const { Title, Paragraph } = Typography;
 
 function Contacts() {
   return (
-    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Контакты и Коммуникации</Title>
       <Paragraph>
         Централизованное управление контактами клиентов и коммуникациями. Интеграция с омниканальными инструментами связи.

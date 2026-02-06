@@ -1,0 +1,27 @@
+ПРОЕКТ УЖЕ ГОТОВ К ЗАГРУЗКЕ
+============================
+Коммит создан, remote добавлен (origin → https://github.com/omashi001/bureau-experts.git).
+
+ЧТО СДЕЛАТЬ СЕЙЧАС (2 шага):
+----------------------------
+
+1. Создать репозиторий на GitHub (если ещё не создан):
+   - Зайдите на https://github.com/new
+   - Repository name: bureau-experts (или своё имя)
+   - Public, БЕЗ README / .gitignore (уже есть в проекте)
+   - Create repository
+
+2. Выполнить push у себя в терминале:
+   - Откройте терминал (Cmd или PowerShell) в папке 6256-main
+     (та, где лежит скрытая папка .git и папка 6256-main с bureau-app).
+   - Команда:  git push -u origin main
+   - Когда спросит Username: введите логин GitHub (например omashi001).
+   - Когда спросит Password: ВСТАВЬТЕ ТОКЕН (не пароль от аккаунта).
+   - Enter. После этого код появится на GitHub.
+
+Если репозиторий называется по-другому или под другим логином:
+   git remote set-url origin https://github.com/ВАШ_ЛОГИН/ИМЯ_РЕПОЗИТОРИЯ.git
+   затем снова:  git push -u origin main
+
+Ссылка на репозиторий будет: https://github.com/omashi001/bureau-experts
+(или ваш логин / имя репо).

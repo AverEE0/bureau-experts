@@ -119,7 +119,7 @@ function App() {
   const renderContent = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard onNavigate={setCurrentPage} />;
       case 'crm-clients':
         return <Clients />;
       case 'crm-deals':
@@ -335,6 +335,7 @@ function App() {
             <Menu.Item key="archive-documents">Документы</Menu.Item>
             <Menu.Item key="archive-media">Медиа</Menu.Item>
             <Menu.Item key="archive-history">История</Menu.Item>
+            <Menu.Item key="archive-reestr">Реестр</Menu.Item>
           </SubMenu>
           <SubMenu key="finance-submenu" icon={<DollarOutlined />} title="Финансы">
             <Menu.Item key="finance-ofd">ОФД</Menu.Item>
@@ -453,6 +454,7 @@ function App() {
             <Menu.Item key="archive-documents">Документы</Menu.Item>
             <Menu.Item key="archive-media">Медиа</Menu.Item>
             <Menu.Item key="archive-history">История</Menu.Item>
+            <Menu.Item key="archive-reestr">Реестр</Menu.Item>
           </SubMenu>
           <SubMenu key="finance-submenu" icon={<DollarOutlined />} title="Финансы">
             <Menu.Item key="finance-ofd">ОФД</Menu.Item>
@@ -475,6 +477,9 @@ function App() {
           </SubMenu>
           <Menu.Item key="settings" icon={<SettingOutlined />}>
             Настройки
+          </Menu.Item>
+          <Menu.Item key="internal-chat" icon={<CommentOutlined />}>
+            Внутренняя переписка
           </Menu.Item>
         </Menu>
       </Drawer>
