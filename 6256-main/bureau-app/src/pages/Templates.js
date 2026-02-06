@@ -207,12 +207,23 @@ function Templates() {
       </Paragraph>
 
       <Row gutter={24} style={{ marginTop: 24 }}>
-        <Col span={14}>
-          <List
-            dataSource={templates}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
+        <Col xs={24} md={14}>
+          <div className="templates-list">
+            {templates.map((item) => (
+              <div key={item.key} className="templates-list-item">
+                <div className="templates-list-item-content">
+                  <FileTextOutlined className="templates-list-item-icon" />
+                  <div className="templates-list-item-text">
+                    <div className="templates-list-item-title">
+                      <Text strong>{item.name}</Text>
+                      {item.file && <Tag className="templates-list-item-tag">{item.file}</Tag>}
+                    </div>
+                    <Paragraph type="secondary" className="templates-list-item-desc">
+                      {item.description}
+                    </Paragraph>
+                  </div>
+                </div>
+                <Space size="small" wrap className="templates-list-item-actions">
                   <Button
                     type="primary"
                     size="small"
@@ -220,42 +231,25 @@ function Templates() {
                     onClick={() => openCreateModal(item)}
                   >
                     Создать документ
-                  </Button>,
-                  <Button
-                    size="small"
-                    icon={<EditOutlined />}
-                    onClick={() => openEditModal(item)}
-                  >
+                  </Button>
+                  <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(item)}>
                     Редактировать
-                  </Button>,
-                  ...(item.file
-                    ? [
-                        <Button
-                          size="small"
-                          icon={<DownloadOutlined />}
-                          onClick={() => handleDownloadTemplate(item)}
-                        >
-                          Скачать шаблон
-                        </Button>,
-                      ]
-                    : []),
-                ]}
-              >
-                <List.Item.Meta
-                  avatar={<FileTextOutlined style={{ fontSize: 24, color: '#a48752' }} />}
-                  title={
-                    <Space>
-                      <Text strong>{item.name}</Text>
-                      {item.file && <Tag>{item.file}</Tag>}
-                    </Space>
-                  }
-                  description={item.description}
-                />
-              </List.Item>
-            )}
-          />
+                  </Button>
+                  {item.file && (
+                    <Button
+                      size="small"
+                      icon={<DownloadOutlined />}
+                      onClick={() => handleDownloadTemplate(item)}
+                    >
+                      Скачать шаблон
+                    </Button>
+                  )}
+                </Space>
+              </div>
+            ))}
+          </div>
         </Col>
-        <Col span={10}>
+        <Col xs={24} md={10}>
           <Card title="Поля для подстановки" size="small">
             <Paragraph type="secondary">
               В шаблонах выделены поля для извлечения или ручного ввода:

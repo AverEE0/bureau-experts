@@ -183,3 +183,76 @@ a:hover,
 .footer-tricolor span:first-child { flex: 0 0 33.33%; background: #fff !important; }
 .footer-tricolor span:nth-child(2) { flex: 0 0 33.33%; background: #0039a6 !important; }
 .footer-tricolor span:last-child { flex: 0 0 33.34%; background: #d52b1e !important; }
+
+/* Страница «Шаблоны документов» — ровная вёрстка без сжатия текста */
+.templates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.templates-list-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.templates-list-item:last-child {
+  border-bottom: none;
+}
+
+.templates-list-item-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.templates-list-item-icon {
+  font-size: 24px;
+  color: #a48752;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.templates-list-item-text {
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.templates-list-item-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.templates-list-item-title .ant-typography {
+  margin-bottom: 0;
+}
+
+.templates-list-item-tag {
+  flex-shrink: 0;
+}
+
+.templates-list-item-desc {
+  margin: 0 !important;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.templates-list-item-actions {
+  flex-shrink: 0;
+  align-self: center;
+}
