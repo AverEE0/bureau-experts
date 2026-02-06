@@ -2,6 +2,7 @@
   "name": "bureau-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://averee0.github.io/bureau-experts",
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
     "@testing-library/dom": "^10.4.1",
