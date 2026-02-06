@@ -244,9 +244,10 @@ function App() {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#e9e9e9' }}>
+    <Layout style={{ minHeight: '100vh', height: '100vh', overflow: 'hidden', background: '#e9e9e9' }}>
       {!isMobile && (
         <Sider
+          className="app-sider-fixed"
           collapsible
           collapsed={siderCollapsed}
           onCollapse={setSiderCollapsed}
@@ -462,8 +463,8 @@ function App() {
             <span style={{ background: '#d52b1e' }} />
           </div>
         </div>
-        <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <div className="app-content" style={{ flex: 1, minHeight: 0 }}>{renderContent()}</div>
+        <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+          <div className="app-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>{renderContent()}</div>
         </div>
       </Layout>
       <Footer className="app-footer">

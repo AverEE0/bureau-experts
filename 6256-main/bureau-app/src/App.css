@@ -24,7 +24,25 @@ body {
   padding: 0 24px;
 }
 
-/* Левый сайдбар — серый, сворачиваемый с иконками */
+/* Левый сайдбар и логотип — не прокручиваются со страницей (скролл только в контенте) */
+.app-sider-fixed.ant-layout-sider {
+  flex: 0 0 auto !important;
+  min-width: 64px !important;
+  max-width: 280px !important;
+  height: 100vh;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+}
+
+.app-sider-fixed .ant-layout-sider-children {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .ant-layout-sider,
 .ant-layout-sider-children {
   background-color: #404040 !important;
