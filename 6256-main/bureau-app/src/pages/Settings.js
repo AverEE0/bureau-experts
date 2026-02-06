@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   Typography,
@@ -11,6 +11,9 @@ import {
   Select,
   Tabs,
   message,
+  List,
+  Popconfirm,
+  Collapse,
 } from 'antd';
 import {
   BankOutlined,
@@ -19,7 +22,11 @@ import {
   ApiOutlined,
   FileTextOutlined,
   GlobalOutlined,
+  AppstoreOutlined,
+  PlusOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
+import { loadServices, saveServices, nextId } from '../servicesConfig';
 
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
@@ -32,6 +39,68 @@ function Settings() {
   const [arbitrEnabled, setArbitrEnabled] = useState(false);
   const [ofdEnabled, setOfdEnabled] = useState(false);
   const [edoEnabled, setEdoEnabled] = useState(false);
+
+  // Услуги и направления (редактируемый список)
+  const [services, setServices] = useState([]);
+  useEffect(() => {
+    setServices(loadServices());
+  }, []);
+
+  const saveServicesConfig = (next) => {
+    setServices((prev) => {
+      const updated = typeof next === 'function' ? next(prev) : next;
+      saveServices(updated);
+      return updated;
+    });
+  };
+
+  const addService = () => {
+    const name = 'Новое направление';
+    saveServicesConfig((prev) => [
+      ...prev,
+      { id: nextId('svc'), name, items: [{ id: nextId('item'), label: 'Поле для заполнения' }] },
+    ]);
+    message.success('Направление добавлено. Отредактируйте название и выноски.');
+  };
+
+  const updateServiceName = (serviceId, name) => {
+    saveServicesConfig((prev) =>
+      prev.map((s) => (s.id === serviceId ? { ...s, name: name || s.name } : s)),
+    );
+  };
+
+  const removeService = (serviceId) => {
+    saveServicesConfig((prev) => prev.filter((s) => s.id !== serviceId));
+    message.success('Направление удалено');
+  };
+
+  const addItem = (serviceId) => {
+    saveServicesConfig((prev) =>
+      prev.map((s) =>
+        s.id === serviceId
+          ? { ...s, items: [...(s.items || []), { id: nextId('item'), label: 'Новая выноска' }] }
+          : s,
+      ),
+    );
+  };
+
+  const updateItem = (serviceId, itemId, label) => {
+    saveServicesConfig((prev) =>
+      prev.map((s) =>
+        s.id === serviceId
+          ? { ...s, items: (s.items || []).map((i) => (i.id === itemId ? { ...i, label } : i)) }
+          : s,
+      ),
+    );
+  };
+
+  const removeItem = (serviceId, itemId) => {
+    saveServicesConfig((prev) =>
+      prev.map((s) =>
+        s.id === serviceId ? { ...s, items: (s.items || []).filter((i) => i.id !== itemId) } : s,
+      ),
+    );
+  };
 
   return (
     <div
@@ -208,6 +277,90 @@ function Settings() {
                   </Form.Item>
                   <Button type="primary" onClick={() => message.success('Настройки документов сохранены')}>Сохранить</Button>
                 </Form>
+              </Card>
+            ),
+          },
+          {
+            key: 'services',
+            label: (
+              <span>
+                <AppstoreOutlined /> Услуги и направления
+              </span>
+            ),
+            children: (
+              <Card size="small">
+                <Paragraph type="secondary" style={{ marginBottom: 16 }}>
+                  Для каждой услуги задайте свои поля (выноски), которые будут выдаваться на заполнение при создании заявки. Можно добавлять новые направления и редактировать список.
+                </Paragraph>
+                <Button type="primary" icon={<PlusOutlined />} onClick={addService} style={{ marginBottom: 16 }}>
+                  Добавить направление
+                </Button>
+                <Collapse
+                  accordion={false}
+                  items={services.map((svc) => ({
+                    key: svc.id,
+                    label: (
+                      <Space>
+                        <Text strong>{svc.name}</Text>
+                        <Text type="secondary">({(svc.items || []).length} полей)</Text>
+                      </Space>
+                    ),
+                    children: (
+                      <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                        <div>
+                          <Text type="secondary">Название направления: </Text>
+                          <Input
+                            value={svc.name}
+                            onChange={(e) => updateServiceName(svc.id, e.target.value)}
+                            onBlur={() => message.success('Сохранено')}
+                            style={{ maxWidth: 400, marginTop: 4 }}
+                            placeholder="Название услуги"
+                          />
+                        </div>
+                        <div>
+                          <Text strong>Что входит (поля для заполнения):</Text>
+                          <List
+                            size="small"
+                            style={{ marginTop: 8 }}
+                            dataSource={svc.items || []}
+                            renderItem={(item) => (
+                              <List.Item
+                                actions={[
+                                  <Popconfirm
+                                    key="del"
+                                    title="Удалить выноску?"
+                                    onConfirm={() => removeItem(svc.id, item.id)}
+                                  >
+                                    <Button type="text" size="small" danger icon={<DeleteOutlined />} />
+                                  </Popconfirm>,
+                                ]}
+                              >
+                                <Input
+                                  value={item.label}
+                                  onChange={(e) => updateItem(svc.id, item.id, e.target.value)}
+                                  onBlur={() => message.success('Сохранено')}
+                                  placeholder="Название поля"
+                                  style={{ maxWidth: 360 }}
+                                />
+                              </List.Item>
+                            )}
+                          />
+                          <Button type="dashed" size="small" icon={<PlusOutlined />} onClick={() => addItem(svc.id)}>
+                            Добавить выноску
+                          </Button>
+                        </div>
+                        <Popconfirm
+                          title="Удалить это направление?"
+                          onConfirm={() => removeService(svc.id)}
+                        >
+                          <Button type="text" danger size="small" icon={<DeleteOutlined />}>
+                            Удалить направление
+                          </Button>
+                        </Popconfirm>
+                      </Space>
+                    ),
+                  }))}
+                />
               </Card>
             ),
           },
