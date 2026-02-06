@@ -1,10 +1,22 @@
-import React from 'react';
-import { Card, Row, Col, Statistic, List, Typography, Button, Space, message } from 'antd';
+import React, { useState } from 'react';
+import { Card, Row, Col, Statistic, List, Typography, Button, Space, message, Modal, InputNumber } from 'antd';
 import { FileProtectOutlined, KeyOutlined, CheckCircleOutlined, LockOutlined, PlusOutlined, UploadOutlined, EyeOutlined } from '@ant-design/icons';
+import { api } from '../api';
 
 const { Title, Paragraph } = Typography;
 
 function Signatures() {
+  const [signModalVisible, setSignModalVisible] = useState(false);
+  const [signDocId, setSignDocId] = useState(null);
+
+  const handleRequestSign = () => {
+    if (signDocId == null) { message.warning('Введите ID документа'); return; }
+    api.requestSignature(signDocId).then((r) => {
+      message.info(r.message || 'Запрос на подпись отправлен');
+      setSignModalVisible(false);
+      setSignDocId(null);
+    }).catch(() => message.error('Ошибка'));
+  };
   return (
     <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Электронные Подписи</Title>
@@ -73,7 +85,11 @@ function Signatures() {
             <Space wrap>
               <Button type="primary" icon={<PlusOutlined />} onClick={() => message.info('Мастер создания сертификата (настраивается через УЦ)')}>Создать сертификат</Button>
               <Button icon={<UploadOutlined />} onClick={() => message.info('Выберите документ для загрузки в разделе «Документы»')}>Загрузить документ</Button>
-              <Button icon={<FileProtectOutlined />} onClick={() => message.info('Выберите документ и нажмите «Подписать» в карточке документа')}>Подписать</Button>
+              <Button icon={<FileProtectOutlined />} onClick={() => setSignModalVisible(true)}>Подписать документ</Button>
+              <Modal title="Запрос подписи" open={signModalVisible} onOk={handleRequestSign} onCancel={() => setSignModalVisible(false)} okText="Отправить">
+                <p>ID документа (из раздела «Документы»):</p>
+                <InputNumber min={1} value={signDocId} onChange={setSignDocId} style={{ width: '100%' }} placeholder="Например: 1" />
+              </Modal>
               <Button icon={<EyeOutlined />} onClick={() => message.success('Проверка подписи: модуль доступен в карточке документа')}>Проверить подпись</Button>
               <Button onClick={() => message.info('История подписей отображается в отчётах')}>История подписей</Button>
             </Space>

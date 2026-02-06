@@ -14,6 +14,9 @@ router = APIRouter(prefix="/api/documents", tags=["documents"])
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+RETENTION_BY_TYPE = {"Договор": 5, "Счет": 5, "Акт": 5, "Отчет об оценке": 10, "Заключение эксперта": 75, "Заключение судебного эксперта": 75}
+DEFAULT_RETENTION = 5
+
 
 @router.get("", response_model=List[DocumentResponse])
 def list_documents(db: Session = Depends(get_db)):
@@ -25,6 +28,8 @@ async def upload_document(
     file: UploadFile = File(...),
     doc_type: Optional[str] = Form("Договор"),
     note: Optional[str] = Form(None),
+    client_id: Optional[int] = Form(None),
+    deal_id: Optional[int] = Form(None),
     db: Session = Depends(get_db),
 ):
     ext = os.path.splitext(file.filename or "")[-1] or ".bin"
@@ -34,7 +39,8 @@ async def upload_document(
         content = await file.read()
         f.write(content)
     name = file.filename or safe_name
-    doc = Document(name=name, doc_type=doc_type, file_path=safe_name, note=note)
+    retention = RETENTION_BY_TYPE.get(doc_type, DEFAULT_RETENTION)
+    doc = Document(name=name, doc_type=doc_type, file_path=safe_name, note=note, client_id=client_id, deal_id=deal_id, retention_years=retention)
     db.add(doc)
     db.commit()
     db.refresh(doc)

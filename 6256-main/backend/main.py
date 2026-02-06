@@ -1,12 +1,21 @@
 """FastAPI backend for БЮРО ЭКСПЕРТОВ."""
+import hashlib
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import engine, Base, SessionLocal
-from models import Client, Deal, Document
-from routers import clients, deals, documents
+from database import engine, Base, SessionLocal, _ensure_document_columns
+from models import Client, Deal, Document, Communication, User, IntegrationConfig
+from routers import clients, deals, documents, communications, auth, fns, ocr, generate, archive, integrations, signatures
 
 Base.metadata.create_all(bind=engine)
+try:
+    _ensure_document_columns()
+except Exception:
+    pass
+
+
+def _hash(p: str) -> str:
+    return hashlib.sha256(p.encode()).hexdigest()
 
 
 def seed_if_empty():
@@ -21,11 +30,16 @@ def seed_if_empty():
                 db.add(Client(**c))
             db.commit()
         if db.query(Deal).count() == 0:
+            clients = {c.name: c.id for c in db.query(Client).all()}
             for d in [
-                {"client_name": "Иванов Иван Иванович", "stage": "В работе", "sum_rub": 45000.0, "date": "2025-02-01"},
-                {"client_name": 'ООО "Ромашка"', "stage": "Акт", "sum_rub": 120000.0, "date": "2025-01-28"},
+                {"client_name": "Иванов Иван Иванович", "stage": "В работе", "sum_rub": 45000.0, "date": "2025-02-01", "client_id": clients.get("Иванов Иван Иванович")},
+                {"client_name": 'ООО "Ромашка"', "stage": "Акт", "sum_rub": 120000.0, "date": "2025-01-28", "client_id": clients.get('ООО "Ромашка"')},
             ]:
                 db.add(Deal(**d))
+            db.commit()
+        if db.query(User).count() == 0:
+            db.add(User(email="admin@bureau.ru", password_hash=_hash("admin"), role="admin", full_name="Администратор"))
+            db.add(User(email="manager@bureau.ru", password_hash=_hash("manager"), role="manager", full_name="Менеджер"))
             db.commit()
     finally:
         db.close()
@@ -46,6 +60,14 @@ app.add_middleware(
 app.include_router(clients.router)
 app.include_router(deals.router)
 app.include_router(documents.router)
+app.include_router(communications.router)
+app.include_router(auth.router)
+app.include_router(fns.router)
+app.include_router(ocr.router)
+app.include_router(generate.router)
+app.include_router(archive.router)
+app.include_router(integrations.router)
+app.include_router(signatures.router)
 
 
 @app.get("/")

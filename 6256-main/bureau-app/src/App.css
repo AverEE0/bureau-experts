@@ -141,7 +141,16 @@ a:hover,
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header .header-emblem-img {
+  height: 40px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
 .app-header .header-org-full {

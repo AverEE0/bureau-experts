@@ -17,7 +17,7 @@ import {
   message,
   Spin,
 } from 'antd';
-import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined, ProfileOutlined } from '@ant-design/icons';
 import { api } from '../api';
 
 const { Title, Paragraph, Text } = Typography;
@@ -30,7 +30,7 @@ const defaultClients = [
   { id: 3, name: 'Петров Петр Петрович', type: 'Физ. лицо', inn: '781012345678', phone: '+7 (900) 333-44-55', email: 'petrov@example.ru', status: 'В работе', segment: 'Частный', manager: 'Сидорова Л.М.' },
 ];
 
-function Clients() {
+function Clients({ onOpenCard }) {
   const [clients, setClients] = useState(defaultClients);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -144,6 +144,15 @@ function Clients() {
       dataIndex: 'manager',
       key: 'manager',
     },
+    ...(onOpenCard ? [{
+      title: 'Действия',
+      key: 'actions',
+      render: (_, record) => (
+        <Button type="link" size="small" icon={<ProfileOutlined />} onClick={() => onOpenCard(record.id)}>
+          Карточка
+        </Button>
+      ),
+    }] : []),
   ];
 
   return (
@@ -260,7 +269,22 @@ function Clients() {
             </Select>
           </Form.Item>
           <Form.Item label="ИНН / ОГРН" name="inn">
-            <Input />
+            <Space.Compact style={{ width: '100%' }}>
+              <Input placeholder="10, 12 (ИНН) или 13, 15 (ОГРН) цифр" />
+              <Button
+                type="default"
+                onClick={() => {
+                  const inn = form.getFieldValue('inn') || '';
+                  if (!inn.trim()) { message.warning('Введите ИНН или ОГРН'); return; }
+                  api.fnsCheck(inn.trim(), inn.trim()).then((r) => {
+                    if (r.valid) message.success(r.message + (r.name ? `: ${r.name}` : ''));
+                    else message.warning(r.message);
+                  }).catch(() => message.error('Ошибка проверки'));
+                }}
+              >
+                Проверить
+              </Button>
+            </Space.Compact>
           </Form.Item>
           <Form.Item label="Телефон" name="phone">
             <Input />

@@ -21,6 +21,7 @@ class Client(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     deals = relationship("Deal", back_populates="client", foreign_keys="Deal.client_id")
+    communications = relationship("Communication", back_populates="client", order_by="Communication.created_at.desc()")
 
 
 class Deal(Base):
@@ -46,3 +47,43 @@ class Document(Base):
     file_path = Column(String(512), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     note = Column(Text, nullable=True)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
+    deal_id = Column(Integer, ForeignKey("deals.id"), nullable=True)
+    retention_years = Column(Integer, nullable=True)  # 3, 5, 10, 75 по ФЗ-125
+    ocr_text = Column(Text, nullable=True)  # результат OCR
+
+
+class Communication(Base):
+    __tablename__ = "communications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey("clients.id"), nullable=False)
+    channel = Column(String(64), nullable=False)  # Telegram, Email, Phone, etc.
+    direction = Column(String(16), default="out")  # in / out
+    subject = Column(String(255), nullable=True)
+    body = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    client = relationship("Client", back_populates="communications", foreign_keys=[client_id])
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String(255), unique=True, nullable=False, index=True)
+    password_hash = Column(String(255), nullable=False)
+    role = Column(String(64), default="manager")  # admin, manager, appraiser, expert, client
+    full_name = Column(String(255), nullable=True)
+    is_active = Column(Integer, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class IntegrationConfig(Base):
+    __tablename__ = "integration_config"
+
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String(64), unique=True, nullable=False)  # fns, gas, rosreestr, ofd, edo, 1c, bank, telegram, ...
+    enabled = Column(Integer, default=0)
+    config_json = Column(Text, nullable=True)  # ключи, URL — хранить зашифрованно в проде
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

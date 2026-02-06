@@ -1,6 +1,6 @@
 """Pydantic schemas for API."""
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -76,6 +76,77 @@ class DocumentResponse(DocumentBase):
     id: int
     file_path: Optional[str] = None
     created_at: Optional[datetime] = None
+    client_id: Optional[int] = None
+    deal_id: Optional[int] = None
+    retention_years: Optional[int] = None
+    ocr_text: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class CommunicationBase(BaseModel):
+    channel: str
+    direction: str = "out"
+    subject: Optional[str] = None
+    body: Optional[str] = None
+
+
+class CommunicationCreate(CommunicationBase):
+    client_id: int
+
+
+class CommunicationResponse(CommunicationBase):
+    id: int
+    client_id: int
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ClientCardResponse(ClientResponse):
+    deals: List[DealResponse] = []
+    documents: List[DocumentResponse] = []
+    communications: List[CommunicationResponse] = []
+
+
+class UserBase(BaseModel):
+    email: str
+    role: str = "manager"
+    full_name: Optional[str] = None
+
+
+class UserCreate(UserBase):
+    password: str
+
+
+class UserResponse(UserBase):
+    id: int
+    is_active: int = 1
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
+
+
+class IntegrationConfigResponse(BaseModel):
+    id: int
+    key: str
+    enabled: bool
+    config_json: Optional[str] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

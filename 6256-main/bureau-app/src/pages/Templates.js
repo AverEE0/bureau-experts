@@ -118,27 +118,44 @@ function Templates() {
   const handleCreateDocument = () => {
     createForm.validateFields().then((values) => {
       const t = selectedTemplate;
-      const deal = values.deal_id ? deals.find((d) => String(d.id) === String(values.deal_id)) : null;
-      const clientName = values.client_name || (deal && deal.client_name) || '—';
-      const content = [
-        `Документ по шаблону: ${t ? t.name : ''}`,
-        `Файл шаблона: ${t && t.file ? t.file : '—'}`,
-        '',
-        '--- Подставленные данные ---',
-        `Заказчик: ${clientName}`,
-        `Адрес объекта: ${values.object_address || '—'}`,
-        `Дата: ${values.date || '—'}`,
-        values.note ? `Примечание: ${values.note}` : '',
-        '',
-        'Сгенерировано в СЭЦ «БЮРО ЭКСПЕРТОВ».',
-      ].filter(Boolean).join('\n');
-
-      const safeName = (t && t.file ? t.file.replace(/\.docx?$/i, '') : t ? t.key : 'document') + '_черновик.txt';
-      downloadBlob(content, safeName);
-      message.success('Черновик документа создан и скачан');
-      setCreateModalVisible(false);
-      setCreateTemplateKey(null);
-      createForm.resetFields();
+      const dealId = values.deal_id ? Number(values.deal_id) : null;
+      api
+        .generateDocument(t ? t.key : 'dogovor', dealId, null)
+        .then((blob) => {
+          const safeName = (t && t.file ? t.file.replace(/\.docx?$/i, '') : t ? t.key : 'document') + '_черновик.txt';
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = safeName;
+          a.click();
+          URL.revokeObjectURL(url);
+          message.success('Документ сформирован и скачан');
+          setCreateModalVisible(false);
+          setCreateTemplateKey(null);
+          createForm.resetFields();
+        })
+        .catch(() => {
+          const deal = dealId ? deals.find((d) => d.id === dealId) : null;
+          const clientName = values.client_name || (deal && deal.client_name) || '—';
+          const content = [
+            `Документ по шаблону: ${t ? t.name : ''}`,
+            `Файл шаблона: ${t && t.file ? t.file : '—'}`,
+            '',
+            '--- Подставленные данные ---',
+            `Заказчик: ${clientName}`,
+            `Адрес объекта: ${values.object_address || '—'}`,
+            `Дата: ${values.date || '—'}`,
+            values.note ? `Примечание: ${values.note}` : '',
+            '',
+            'Сгенерировано в СЭЦ «БЮРО ЭКСПЕРТОВ».',
+          ].filter(Boolean).join('\n');
+          const safeName = (t && t.file ? t.file.replace(/\.docx?$/i, '') : t ? t.key : 'document') + '_черновик.txt';
+          downloadBlob(content, safeName);
+          message.success('Черновик создан (локально)');
+          setCreateModalVisible(false);
+          setCreateTemplateKey(null);
+          createForm.resetFields();
+        });
     }).catch(() => {});
   };
 

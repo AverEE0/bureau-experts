@@ -1,10 +1,29 @@
 import React from 'react';
 import { Card, Row, Col, Statistic, List, Typography, Button, Space, message } from 'antd';
 import { FolderOpenOutlined, FileTextOutlined, DatabaseOutlined, SearchOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import { api } from '../api';
 
 const { Title, Paragraph } = Typography;
 
 function ArchiveDocs() {
+  const handleExportXml = () => {
+    const url = api.getArchiveExportXmlUrl();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'archive_register.xml';
+    a.target = '_blank';
+    a.click();
+    message.success('Экспорт XML запущен');
+  };
+  const handleExportCsv = () => {
+    const url = api.getArchiveExportCsvUrl();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'archive_register.csv';
+    a.target = '_blank';
+    a.click();
+    message.success('Экспорт CSV запущен');
+  };
   return (
     <div style={{ padding: 24, background: '#fff', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
       <Title level={2}>Архив документов</Title>
@@ -100,6 +119,8 @@ function ArchiveDocs() {
           <Card title="Архивные действия" bordered={false}>
             <Space wrap>
               <Button type="primary" icon={<UploadOutlined />} onClick={() => message.info('Загрузка в архив — в разделе «Документы»')}>Загрузить документ</Button>
+              <Button icon={<DownloadOutlined />} onClick={handleExportXml}>Экспорт XML</Button>
+              <Button icon={<DownloadOutlined />} onClick={handleExportCsv}>Экспорт CSV</Button>
               <Button icon={<SearchOutlined />} onClick={() => message.success('Откройте поиск по реестру в разделе «Реестр»')}>Поиск в архиве</Button>
               <Button icon={<DownloadOutlined />} onClick={() => message.info('Скачивание из карточки документа')}>Скачать</Button>
               <Button onClick={() => message.success('Папка создана (настройка структуры на бэкенде)')}>Создать папку</Button>

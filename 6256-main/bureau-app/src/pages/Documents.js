@@ -58,8 +58,21 @@ const Documents = () => {
     return false; // prevent default upload
   };
 
+  const [ocrLoadingId, setOcrLoadingId] = React.useState(null);
+
   const handleClassifyAll = () => message.info('Классификация выполняется на бэкенде (заглушка)');
-  const handleOcrAll = () => message.info('OCR выполняется на бэкенде (заглушка)');
+  const handleOcrAll = () => message.info('Выберите документ и нажмите «Распознать» в строке');
+
+  const handleOcr = (docId) => {
+    setOcrLoadingId(docId);
+    api.ocrDocument(docId)
+      .then((r) => {
+        setDocs((prev) => prev.map((d) => (d.id === docId ? { ...d, ocr_text: r.text } : d)));
+        message.success(r.text ? `Распознано ${r.text.length} символов` : (r.message || 'Готово'));
+      })
+      .catch(() => message.error('Ошибка OCR'))
+      .finally(() => setOcrLoadingId(null));
+  };
 
   const columns = [
     {
@@ -76,6 +89,15 @@ const Documents = () => {
     { title: 'Тип документа', dataIndex: 'doc_type', key: 'doc_type' },
     { title: 'Примечание', dataIndex: 'note', key: 'note', render: (v) => v || '—' },
     { title: 'Загружен', dataIndex: 'created_at', key: 'created_at', render: formatDate },
+    {
+      title: 'Действия',
+      key: 'actions',
+      render: (_, record) => (
+        <Button type="link" size="small" loading={ocrLoadingId === record.id} onClick={() => handleOcr(record.id)}>
+          Распознать
+        </Button>
+      ),
+    },
   ];
 
   return (

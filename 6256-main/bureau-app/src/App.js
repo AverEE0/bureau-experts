@@ -19,6 +19,7 @@ import {
 import logoBuro from './assets/logo-buro.png';
 import Dashboard from './pages/Dashboard';
 import Clients from './pages/Clients';
+import ClientCard from './pages/ClientCard';
 import Deals from './pages/Deals';
 import Contacts from './pages/Contacts';
 import CRMHistory from './pages/CRMHistory';
@@ -103,6 +104,7 @@ const ORG_NAME = 'СЭЦ «БЮРО ЭКСПЕРТОВ»';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentClientId, setCurrentClientId] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [siderCollapsed, setSiderCollapsed] = useState(false);
@@ -173,8 +175,10 @@ function App() {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard onNavigate={setCurrentPage} />;
+      case 'client-card':
+        return <ClientCard clientId={currentClientId} onClose={() => setCurrentPage('crm-clients')} />;
       case 'crm-clients':
-        return <Clients />;
+        return <Clients onOpenCard={(id) => { setCurrentClientId(id); setCurrentPage('client-card'); }} />;
       case 'crm-deals':
         return <Deals />;
       case 'crm-contacts':
@@ -443,6 +447,7 @@ function App() {
               )}
             </div>
             <div className="header-title-center">
+              <img src={`${process.env.PUBLIC_URL || ''}/emblem.png`} alt="" className="header-emblem-img" />
               <span className="header-org-full">СУДЕБНО-ЭКСПЕРТНЫЙ ЦЕНТР «БЮРО ЭКСПЕРТОВ»</span>
             </div>
             <Space size="middle" style={{ width: 120, justifyContent: 'flex-end' }}>
