@@ -1,0 +1,97 @@
+import React from 'react';
+import { Card, Row, Col, Statistic, List, Typography, Progress, Button, Space } from 'antd';
+import { FileProtectOutlined, KeyOutlined, CheckCircleOutlined, LockOutlined, PlusOutlined, UploadOutlined, EyeOutlined } from '@ant-design/icons';
+
+const { Title, Paragraph } = Typography;
+
+function Signatures() {
+  return (
+    <div style={{ padding: 24, background: '#f0f2f5', minHeight: '100vh' }}>
+      <Title level={2}>Электронные Подписи</Title>
+      <Paragraph>
+        Система электронного подписания документов. Интеграция с УЦ ФНС, обеспечение юридической значимости документов.
+      </Paragraph>
+
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Подписей" value={5670} prefix={<FileProtectOutlined />} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Сертификатов" value={89} prefix={<KeyOutlined />} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Валидных" value={82} suffix="%" prefix={<CheckCircleOutlined />} />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic title="Защищенных" value={99.9} suffix="%" prefix={<LockOutlined />} />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
+        <Col span={12}>
+          <Card title="Типы подписей" bordered={false}>
+            <List
+              dataSource={[
+                'Простая электронная подпись',
+                'Усиленная неквалифицированная ЭП',
+                'Усиленная квалифицированная ЭП',
+                'Совместное подписание',
+                'Многоуровневое согласование'
+              ]}
+              renderItem={item => <List.Item>{item}</List.Item>}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card title="Функционал ЭП" bordered={false}>
+            <List
+              dataSource={[
+                'Интеграция с УЦ ФНС и коммерческими УЦ',
+                'Проверка валидности сертификатов',
+                'Отзыв и блокировка подписей',
+                'Аудит и логи подписаний',
+                'Мобильное подписание',
+                'Интеграция с ЭДО системами'
+              ]}
+              renderItem={item => <List.Item>{item}</List.Item>}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      <Row style={{ marginTop: 24 }}>
+        <Col span={24}>
+          <Card title="Управление подписями" bordered={false}>
+            <Space>
+              <Button type="primary" icon={<PlusOutlined />}>
+                Создать сертификат
+              </Button>
+              <Button icon={<UploadOutlined />}>
+                Загрузить документ
+              </Button>
+              <Button icon={<FileProtectOutlined />}>
+                Подписать
+              </Button>
+              <Button icon={<EyeOutlined />}>
+                Проверить подпись
+              </Button>
+              <Button>
+                История подписей
+              </Button>
+            </Space>
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
+}
+
+export default Signatures;
