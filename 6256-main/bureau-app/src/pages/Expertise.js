@@ -40,7 +40,6 @@ function Expertise() {
   const [isCourtCase, setIsCourtCase] = useState(false);
   const [form] = Form.useForm();
 
-  const publicUrl = process.env.PUBLIC_URL || '';
   return (
     <div
       style={{
@@ -50,9 +49,6 @@ function Expertise() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
       }}
     >
-      <div style={{ textAlign: 'center', marginBottom: 20 }}>
-        <img src={`${publicUrl}/logo-eagle.jpg`} alt="БЮРО ЭКСПЕРТОВ" style={{ maxHeight: 72, objectFit: 'contain' }} />
-      </div>
       <Title level={2}>
         <ExperimentOutlined style={{ marginRight: 8 }} />
         Судебная экспертиза

@@ -21,20 +21,8 @@ const Dashboard = ({ onNavigate }) => {
     { key: 'documents-templates', label: 'Шаблоны', icon: <FileTextOutlined /> },
   ];
 
-  const [bannerVisible, setBannerVisible] = React.useState(true);
-  const publicUrl = process.env.PUBLIC_URL || '';
   return (
     <Content className="dashboard-content-full">
-      {bannerVisible && (
-        <div className="dashboard-banner-wrap">
-          <img
-            src={`${publicUrl}/logo-banner.jpg`}
-            alt="БЮРО ЭКСПЕРТОВ"
-            className="dashboard-banner"
-            onError={() => setBannerVisible(false)}
-          />
-        </div>
-      )}
       {onNavigate && (
         <Card size="small" style={{ marginBottom: 24 }}>
           <Text type="secondary" style={{ marginRight: 8 }}>Быстрые переходы:</Text>
