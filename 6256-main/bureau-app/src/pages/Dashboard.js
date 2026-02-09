@@ -13,12 +13,21 @@ const { Content } = Layout;
 const { Text } = Typography;
 const { Option } = Select;
 
-const Dashboard = ({ onNavigate }) => {
+const Dashboard = ({ onNavigate, onOpenCard }) => {
   const [year, setYear] = useState(new Date().getFullYear());
-  const [clients, setClients] = useState([]);
+  const [lastClients, setLastClients] = useState([]);
 
   useEffect(() => {
-    api.getClients().then((data) => setClients(Array.isArray(data) ? data.slice(0, 10) : [])).catch(() => setClients([]));
+    api.getDashboardLastClients(10)
+      .then((data) => setLastClients(Array.isArray(data) ? data : []))
+      .catch(() => {
+        api.getClients()
+          .then((data) => {
+            const list = Array.isArray(data) ? data.slice(0, 10) : [];
+            setLastClients(list.map((c) => ({ ...c, channels: [] })));
+          })
+          .catch(() => setLastClients([]));
+      });
   }, []);
 
   const completedByActivity = [
@@ -29,7 +38,8 @@ const Dashboard = ({ onNavigate }) => {
   ];
   const income = 2847500;
   const expenses = 1120000;
-  const years = [year, year - 1, year - 2];
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 5 }, (_, i) => currentYear - i);
 
   const quickLinks = [
     { key: 'crm-clients', label: 'Клиенты и реестр', icon: <TeamOutlined /> },
@@ -61,7 +71,7 @@ const Dashboard = ({ onNavigate }) => {
         </Col>
         <Col span={6}>
           <Card>
-            <Statistic title="Клиенты" value={clients.length > 0 ? clients.length : 5832} prefix={<TeamOutlined />} valueStyle={{ color: '#a48752' }} />
+            <Statistic title="Клиенты" value={lastClients.length > 0 ? lastClients.length : '—'} prefix={<TeamOutlined />} valueStyle={{ color: '#a48752' }} />
             <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-clients')}>Перейти</Button>
           </Card>
         </Col>
@@ -85,11 +95,13 @@ const Dashboard = ({ onNavigate }) => {
           >
             {completedByActivity.map(({ activity, count, active }) => (
               <div key={activity} style={{ marginBottom: 12 }}>
-                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Space style={{ width: '100%', justifyContent: 'space-between' }} wrap>
                   <Text>{activity}</Text>
                   <Space>
                     <Tag color="green">Выполнено: {count}</Tag>
-                    <Tag color="blue">Активных: {active}</Tag>
+                    <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-deals')}>
+                      <Tag color="blue">Активных: {active} → к делам</Tag>
+                    </Button>
                   </Space>
                 </Space>
               </div>
@@ -106,6 +118,7 @@ const Dashboard = ({ onNavigate }) => {
                 ))}
               </Select>
             </Space>
+            <Text type="secondary" style={{ fontSize: 12, display: 'block', marginTop: 4 }}>Динамика доходов и дел с начала года, просмотр предыдущих лет</Text>
             <div style={{ textAlign: 'center', padding: 16 }}>
               <Text>Доходы за {year}: рост к прошлому году</Text>
               <br />
@@ -135,13 +148,16 @@ const Dashboard = ({ onNavigate }) => {
           >
             <List
               size="small"
-              dataSource={clients.length > 0 ? clients : [
-                { id: 1, name: 'Иванов Иван Иванович', phone: '+7 (900) 111-22-33', status: 'Активный' },
-                { id: 2, name: 'ООО "Ромашка"', email: 'info@romashka.ru', status: 'Новый' },
-                { id: 3, name: 'Петров Петр Петрович', phone: '+7 (900) 333-44-55', status: 'В работе' },
+              dataSource={lastClients.length > 0 ? lastClients : [
+                { id: 1, name: 'Иванов Иван Иванович', phone: '+7 (900) 111-22-33', status: 'Активный', channels: [] },
+                { id: 2, name: 'ООО "Ромашка"', email: 'info@romashka.ru', status: 'Новый', channels: [] },
+                { id: 3, name: 'Петров Петр Петрович', phone: '+7 (900) 333-44-55', status: 'В работе', channels: [] },
               ]}
               renderItem={(item) => (
-                <List.Item>
+                <List.Item
+                  style={onOpenCard && item.id ? { cursor: 'pointer' } : undefined}
+                  onClick={() => onOpenCard && item.id && onOpenCard(item.id)}
+                >
                   <List.Item.Meta
                     avatar={<UserOutlined style={{ color: '#a48752' }} />}
                     title={<Text strong>{item.name}</Text>}
@@ -152,9 +168,11 @@ const Dashboard = ({ onNavigate }) => {
                             {item.phone || item.email}
                           </Text>
                         )}
-                        <Space size={4}>
+                        <Space size={4} wrap>
                           <Tag color={item.status === 'Активный' ? '#a48752' : '#333'}>{item.status}</Tag>
-                          <Text type="secondary" style={{ fontSize: 11 }}>Каналы: Telegram, Email</Text>
+                          <Text type="secondary" style={{ fontSize: 11 }}>
+                            Каналы: {item.channels && item.channels.length > 0 ? item.channels.join(', ') : '—'}
+                          </Text>
                         </Space>
                       </Space>
                     }

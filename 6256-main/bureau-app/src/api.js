@@ -33,6 +33,9 @@ export const api = {
   async getClientCard(id) {
     return request(`/api/clients/${id}/card`);
   },
+  async getDashboardLastClients(limit = 10) {
+    return request(`/api/dashboard/last-clients?limit=${limit}`);
+  },
   async updateClient(id, body) {
     return request(`/api/clients/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
   },

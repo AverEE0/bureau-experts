@@ -189,7 +189,7 @@ function App() {
   const renderContent = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return <Dashboard onNavigate={setCurrentPage} onOpenCard={(id) => { setCurrentClientId(id); setCurrentPage('client-card'); const path = BASE_PATH + `/crm/clients/${id}`; if (window.history.pushState) window.history.pushState({}, '', path); }} />;
       case 'client-card':
         return (
           <ClientCard

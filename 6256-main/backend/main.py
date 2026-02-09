@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, Base, SessionLocal, _ensure_document_columns
 from models import Client, Deal, Document, Communication, User, IntegrationConfig
-from routers import clients, deals, documents, communications, auth, fns, ocr, generate, archive, integrations, signatures
+from routers import clients, deals, documents, communications, auth, fns, ocr, generate, archive, integrations, signatures, dashboard
 
 Base.metadata.create_all(bind=engine)
 try:
@@ -74,6 +74,7 @@ app.include_router(generate.router)
 app.include_router(archive.router)
 app.include_router(integrations.router)
 app.include_router(signatures.router)
+app.include_router(dashboard.router)
 
 
 @app.get("/")
