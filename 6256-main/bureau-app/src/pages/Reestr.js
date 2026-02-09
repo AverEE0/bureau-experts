@@ -109,7 +109,7 @@ function Reestr() {
             <Descriptions.Item label="Тип">{selectedRow.type}</Descriptions.Item>
             <Descriptions.Item label="Дата">{selectedRow.date}</Descriptions.Item>
             <Descriptions.Item label="Статус">{selectedRow.status}</Descriptions.Item>
-            <Descriptions.Item label="Ответственный">{selectedRow.manager}</Descriptions.Item>
+            <Descriptions.Item label="Эксперт/специалист">{selectedRow.manager}</Descriptions.Item>
             {selectedRow.phone != null && (
               <Descriptions.Item label="Телефон">{selectedRow.phone}</Descriptions.Item>
             )}

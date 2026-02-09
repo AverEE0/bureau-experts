@@ -1,23 +1,41 @@
-import React from 'react';
-import { Layout, Card, Row, Col, Statistic, Button, Avatar, List, Tag, Progress, Typography, Space } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Layout, Card, Row, Col, Statistic, Button, List, Tag, Typography, Space, Select } from 'antd';
 import {
   FileTextOutlined,
   TeamOutlined,
-  DollarOutlined,
   UserOutlined,
-  TeamOutlined as TeamIcon,
+  RiseOutlined,
+  FallOutlined,
 } from '@ant-design/icons';
+import { api } from '../api';
 
 const { Content } = Layout;
 const { Text } = Typography;
+const { Option } = Select;
 
 const Dashboard = ({ onNavigate }) => {
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [clients, setClients] = useState([]);
+
+  useEffect(() => {
+    api.getClients().then((data) => setClients(Array.isArray(data) ? data.slice(0, 10) : [])).catch(() => setClients([]));
+  }, []);
+
+  const completedByActivity = [
+    { activity: 'Судебная экспертиза', count: 124, active: 18 },
+    { activity: 'Оценка недвижимости', count: 89, active: 12 },
+    { activity: 'Юридическое сопровождение', count: 56, active: 8 },
+    { activity: 'Риэлторская деятельность', count: 34, active: 5 },
+  ];
+  const income = 2847500;
+  const expenses = 1120000;
+  const years = [year, year - 1, year - 2];
+
   const quickLinks = [
-    { key: 'crm-clients', label: 'Клиенты', icon: <TeamOutlined /> },
+    { key: 'crm-clients', label: 'Клиенты и реестр', icon: <TeamOutlined /> },
     { key: 'documents', label: 'Документы', icon: <FileTextOutlined /> },
     { key: 'cycles-expertise', label: 'Экспертиза', icon: <FileTextOutlined /> },
     { key: 'cycles-valuation', label: 'Оценка', icon: <FileTextOutlined /> },
-    { key: 'archive-reestr', label: 'Реестр', icon: <FileTextOutlined /> },
     { key: 'documents-templates', label: 'Шаблоны', icon: <FileTextOutlined /> },
   ];
 
@@ -33,86 +51,113 @@ const Dashboard = ({ onNavigate }) => {
           </Space>
         </Card>
       )}
+
       <Row gutter={24}>
         <Col span={6}>
           <Card>
-            <Statistic title="Активные дела" value={1247} prefix={<FileTextOutlined />} valueStyle={{ color: '#a48752' }} />
+            <Statistic title="Активные дела" value={43} prefix={<FileTextOutlined />} valueStyle={{ color: '#a48752' }} />
+            <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-deals')}>Перейти к делам</Button>
           </Card>
         </Col>
         <Col span={6}>
           <Card>
-            <Statistic title="Клиенты" value={5832} prefix={<TeamOutlined />} valueStyle={{ color: '#a48752' }} />
+            <Statistic title="Клиенты" value={clients.length > 0 ? clients.length : 5832} prefix={<TeamOutlined />} valueStyle={{ color: '#a48752' }} />
+            <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-clients')}>Перейти</Button>
           </Card>
         </Col>
         <Col span={6}>
           <Card>
-            <Statistic title="Документы" value={15420} prefix={<FileTextOutlined />} valueStyle={{ color: '#a48752' }} />
+            <Statistic title="Доходы" value={income} prefix={<RiseOutlined />} suffix="₽" valueStyle={{ color: '#52c41a' }} />
           </Card>
         </Col>
         <Col span={6}>
           <Card>
-            <Statistic title="Доходы" value={2847500} prefix={<DollarOutlined />} suffix="₽" valueStyle={{ color: '#a48752' }} />
+            <Statistic title="Расходы" value={expenses} prefix={<FallOutlined />} suffix="₽" valueStyle={{ color: '#ff4d4f' }} />
           </Card>
         </Col>
       </Row>
+
       <Row gutter={24} style={{ marginTop: 24 }}>
         <Col span={12}>
-          <Card title="Динамика доходов и дел" extra={<Button type="link" onClick={() => onNavigate && onNavigate('reports-analytics')}>Подробнее</Button>}>
-            <div style={{ textAlign: 'center', padding: 20 }}>
-              <Text>График доходов: Рост на 40% за полгода</Text>
-              <br />
-              <Text>Количество дел: Увеличение на 83%</Text>
-            </div>
+          <Card
+            title="Выполнено дел по деятельности"
+            extra={<Button type="link" onClick={() => onNavigate && onNavigate('crm-deals')}>К делам</Button>}
+          >
+            {completedByActivity.map(({ activity, count, active }) => (
+              <div key={activity} style={{ marginBottom: 12 }}>
+                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                  <Text>{activity}</Text>
+                  <Space>
+                    <Tag color="green">Выполнено: {count}</Tag>
+                    <Tag color="blue">Активных: {active}</Tag>
+                  </Space>
+                </div>
+              </div>
+            ))}
           </Card>
         </Col>
         <Col span={12}>
-          <Card title="Распределение бизнес-циклов" extra={<Button type="link" onClick={() => onNavigate && onNavigate('reports-operational')}>Управление</Button>}>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span>Судебная экспертиза</span>
-                <span>35%</span>
-              </div>
-              <Progress percent={35} strokeColor="#a48752" />
+          <Card title="Динамика доходов и дел с начала года">
+            <Space style={{ marginBottom: 12 }}>
+              <Text>Год:</Text>
+              <Select value={year} onChange={setYear} style={{ width: 100 }}>
+                {years.map((y) => (
+                  <Option key={y} value={y}>{y}</Option>
+                ))}
+              </Select>
+            </Space>
+            <div style={{ textAlign: 'center', padding: 16 }}>
+              <Text>Доходы за {year}: рост к прошлому году</Text>
+              <br />
+              <Text>Дела за {year}: динамика по активностям</Text>
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span>Оценка недвижимости</span>
-                <span>30%</span>
-              </div>
-              <Progress percent={30} strokeColor="#a48752" />
-            </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span>Юридическое сопровождение</span>
-                <span>20%</span>
-              </div>
-              <Progress percent={20} strokeColor="#a48752" />
-            </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span>Риэлторская оценка</span>
-                <span>15%</span>
-              </div>
-              <Progress percent={15} strokeColor="#a48752" />
-            </div>
+            <Button type="link" onClick={() => onNavigate && onNavigate('reports-analytics')}>Подробная аналитика</Button>
           </Card>
         </Col>
       </Row>
+
       <Row gutter={24} style={{ marginTop: 24 }}>
         <Col span={8}>
-          <Card title="Последние клиенты" extra={<Button type="link">Все</Button>}>
+          <Card
+            title="Карточка предприятия"
+            extra={<Button type="link" onClick={() => onNavigate && onNavigate('settings')}>Настройки</Button>}
+          >
+            <Space direction="vertical">
+              <Text strong>СЭЦ «БЮРО ЭКСПЕРТОВ»</Text>
+              <Text type="secondary">Судебная экспертиза, оценка, юридические услуги</Text>
+            </Space>
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card
+            title="Последние 10 клиентов"
+            extra={<Button type="link" onClick={() => onNavigate && onNavigate('crm-clients')}>Все</Button>}
+          >
             <List
-              dataSource={[
-                { name: 'Иванов Иван Иванович', status: 'Активный', avatar: <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#000000' }} /> },
-                { name: 'ООО "Ромашка"', status: 'Новый', avatar: <Avatar icon={<TeamIcon />} style={{ backgroundColor: '#333333' }} /> },
-                { name: 'Петров Петр Петрович', status: 'Завершен', avatar: <Avatar icon={<UserOutlined />} style={{ backgroundColor: '#a48752' }} /> },
+              size="small"
+              dataSource={clients.length > 0 ? clients : [
+                { id: 1, name: 'Иванов Иван Иванович', phone: '+7 (900) 111-22-33', status: 'Активный' },
+                { id: 2, name: 'ООО "Ромашка"', email: 'info@romashka.ru', status: 'Новый' },
+                { id: 3, name: 'Петров Петр Петрович', phone: '+7 (900) 333-44-55', status: 'В работе' },
               ]}
-              renderItem={item => (
+              renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
-                    avatar={item.avatar}
+                    avatar={<UserOutlined style={{ color: '#a48752' }} />}
                     title={<Text strong>{item.name}</Text>}
-                    description={<Tag color={item.status === 'Активный' ? '#a48752' : '#333333'}>{item.status}</Tag>}
+                    description={
+                      <Space direction="vertical" size={0}>
+                        {(item.phone || item.email) && (
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            {item.phone || item.email}
+                          </Text>
+                        )}
+                        <Space size={4}>
+                          <Tag color={item.status === 'Активный' ? '#a48752' : '#333'}>{item.status}</Tag>
+                          <Text type="secondary" style={{ fontSize: 11 }}>Каналы: Telegram, Email</Text>
+                        </Space>
+                      </Space>
+                    }
                   />
                 </List.Item>
               )}
@@ -120,43 +165,18 @@ const Dashboard = ({ onNavigate }) => {
           </Card>
         </Col>
         <Col span={8}>
-          <Card title="Omnichannel Каналы связи" extra={<Button type="link">Настроить</Button>}>
-            <Space direction="vertical" size="small">
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Telegram Bot API</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>MAX (российский)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>BIP (турецкий)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>SMS (SMSc.ru)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Email (SMTP)</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span>WebRTC Звонки</span>
-              </div>
-            </Space>
-          </Card>
-        </Col>
-        <Col span={8}>
-          <Card title="Архив и Финансы" extra={<Button type="link">Интеграции</Button>}>
+          <Card title="Архив и Финансы" extra={<Button type="link" onClick={() => onNavigate && onNavigate('finance-ofd')}>Интеграции</Button>}>
             <Space direction="vertical" size="small">
               <div>
                 <Text strong>Архив:</Text>
                 <br />
-                <Text>Зашифрованное хранение, сроки 3-75 лет</Text>
+                <Text>Зашифрованное хранение, сроки 3–75 лет</Text>
               </div>
               <div>
                 <Text strong>Финансы:</Text>
                 <br />
                 <Text>ОФД, ЭДО, 1С, Банки</Text>
               </div>
-              <Button type="primary" block>Экспорт / Платежи</Button>
             </Space>
           </Card>
         </Col>

@@ -17,7 +17,7 @@ import {
   message,
   Spin,
 } from 'antd';
-import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined, ProfileOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined, ProfileOutlined, UnorderedListOutlined, EditOutlined } from '@ant-design/icons';
 import { api } from '../api';
 
 const { Title, Paragraph, Text } = Typography;
@@ -30,14 +30,17 @@ const defaultClients = [
   { id: 3, name: 'Петров Петр Петрович', type: 'Физ. лицо', inn: '781012345678', phone: '+7 (900) 333-44-55', email: 'petrov@example.ru', status: 'В работе', segment: 'Частный', manager: 'Сидорова Л.М.' },
 ];
 
-function Clients({ onOpenCard }) {
+function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
   const [clients, setClients] = useState(defaultClients);
+  const [deals, setDeals] = useState([]);
+  const [dealsLoading, setDealsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState();
   const [modalVisible, setModalVisible] = useState(false);
   const [cardVisible, setCardVisible] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [editingClientId, setEditingClientId] = useState(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -51,6 +54,19 @@ function Clients({ onOpenCard }) {
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (defaultTab === 'reestr') loadDeals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultTab]);
+
+  const loadDeals = () => {
+    setDealsLoading(true);
+    api.getDeals()
+      .then((data) => setDeals(Array.isArray(data) ? data : []))
+      .catch(() => setDeals([]))
+      .finally(() => setDealsLoading(false));
+  };
 
   const filteredClients = useMemo(
     () =>
@@ -86,9 +102,37 @@ function Clients({ onOpenCard }) {
         };
         setClients((prev) => [newClient, ...prev]);
         setModalVisible(false);
+        setEditingClientId(null);
         form.resetFields();
       })
       .catch(() => {});
+  };
+
+  const handleUpdateClient = () => {
+    if (!editingClientId) return;
+    form
+      .validateFields()
+      .then((values) => {
+        api.updateClient(editingClientId, values)
+          .then((updated) => {
+            setClients((prev) => prev.map((c) => (c.id === editingClientId ? { ...c, ...updated } : c)));
+            setModalVisible(false);
+            setEditingClientId(null);
+            form.resetFields();
+            setSelectedClient((prev) => (prev && prev.id === editingClientId ? { ...prev, ...updated } : prev));
+            message.success('Данные клиента сохранены');
+          })
+          .catch(() => message.error('Не удалось сохранить изменения'));
+      })
+      .catch(() => {});
+  };
+
+  const openEditClient = () => {
+    if (!selectedClient) return;
+    form.setFieldsValue(selectedClient);
+    setEditingClientId(selectedClient.id);
+    setCardVisible(false);
+    setModalVisible(true);
   };
 
   const columns = [
@@ -140,7 +184,7 @@ function Clients({ onOpenCard }) {
       key: 'segment',
     },
     {
-      title: 'Менеджер',
+      title: 'Эксперт/специалист',
       dataIndex: 'manager',
       key: 'manager',
     },
@@ -155,6 +199,31 @@ function Clients({ onOpenCard }) {
     }] : []),
   ];
 
+  const reestrColumns = [
+    { title: 'Клиент', dataIndex: 'client_name', key: 'client_name' },
+    { title: 'Этап', dataIndex: 'stage', key: 'stage', render: (s) => <Tag color="#333">{s}</Tag> },
+    { title: 'Сумма', dataIndex: 'sum_rub', key: 'sum_rub', render: (v) => v != null ? `${Number(v).toLocaleString('ru-RU')} ₽` : '—' },
+    { title: 'Дата', dataIndex: 'date', key: 'date' },
+    {
+      title: 'Действия',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          {record.client_id && onOpenCard && (
+            <Button type="link" size="small" icon={<UserOutlined />} onClick={() => onOpenCard(record.client_id)}>
+              Карточка клиента
+            </Button>
+          )}
+          {onNavigate && (
+            <Button type="link" size="small" icon={<EditOutlined />} onClick={() => onNavigate('crm-deals')}>
+              Изменить
+            </Button>
+          )}
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <div
       style={{
@@ -167,10 +236,10 @@ function Clients({ onOpenCard }) {
       <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
         <Col>
           <Title level={2} style={{ marginBottom: 4 }}>
-            Управление клиентами
+            Клиенты и реестр
           </Title>
           <Paragraph style={{ marginBottom: 0 }}>
-            Базовая CRM: регистрация клиентов, быстрый поиск и фильтрация, сегментация и учёт ответственных.
+            Клиентская база и реестр дел. Регистрация клиентов, поиск, учёт ответственного эксперта/специалиста. Возможность исправления данных.
           </Paragraph>
         </Col>
         <Col>
@@ -183,7 +252,7 @@ function Clients({ onOpenCard }) {
               Добавить клиента
             </Button>
             <Button icon={<ExportOutlined />} onClick={() => {
-              const headers = ['Клиент', 'Тип', 'ИНН', 'Телефон', 'Email', 'Статус', 'Сегмент', 'Менеджер'];
+              const headers = ['Клиент', 'Тип', 'ИНН', 'Телефон', 'Email', 'Статус', 'Сегмент', 'Эксперт/специалист'];
               const rows = filteredClients.map((c) => [c.name, c.type, c.inn, c.phone, c.email, c.status, c.segment, c.manager].map((v) => `"${String(v || '').replace(/"/g, '""')}"`).join(','));
               const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
               const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
@@ -201,51 +270,88 @@ function Clients({ onOpenCard }) {
         </Col>
       </Row>
 
-      <Card
-        title="Клиентская база"
-        extra={
-          <Space>
-            <Input
-              allowClear
-              prefix={<SearchOutlined />}
-              placeholder="Поиск по имени, ИНН или телефону"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ width: 260 }}
-            />
-            <Select
-              allowClear
-              placeholder="Статус"
-              style={{ width: 140 }}
-              value={statusFilter}
-              onChange={(value) => setStatusFilter(value)}
-            >
-              <Option value="Новый">Новый</Option>
-              <Option value="Активный">Активный</Option>
-              <Option value="В работе">В работе</Option>
-            </Select>
-          </Space>
-        }
-      >
-        <Spin spinning={loading}>
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredClients}
-          pagination={{ pageSize: 8, showSizeChanger: false }}
-          onRow={(record) => ({
-            onClick: () => { setSelectedClient(record); setCardVisible(true); },
-            style: { cursor: 'pointer' },
-          })}
-        />
-        </Spin>
-      </Card>
+      <Tabs
+        defaultActiveKey={defaultTab === 'reestr' ? 'reestr' : 'base'}
+        onChange={(key) => { if (key === 'reestr') loadDeals(); }}
+        items={[
+          {
+            key: 'base',
+            label: <span><UserOutlined /> Клиентская база</span>,
+            children: (
+              <Card
+                title="Клиентская база"
+                extra={
+                  <Space>
+                    <Input
+                      allowClear
+                      prefix={<SearchOutlined />}
+                      placeholder="Поиск по имени, ИНН или телефону"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      style={{ width: 260 }}
+                    />
+                    <Select
+                      allowClear
+                      placeholder="Статус"
+                      style={{ width: 140 }}
+                      value={statusFilter}
+                      onChange={(value) => setStatusFilter(value)}
+                    >
+                      <Option value="Новый">Новый</Option>
+                      <Option value="Активный">Активный</Option>
+                      <Option value="В работе">В работе</Option>
+                    </Select>
+                  </Space>
+                }
+              >
+                <Spin spinning={loading}>
+                  <Table
+                    rowKey="id"
+                    columns={columns}
+                    dataSource={filteredClients}
+                    pagination={{ pageSize: 8, showSizeChanger: false }}
+                    onRow={(record) => ({
+                      onClick: () => { setSelectedClient(record); setCardVisible(true); },
+                      style: { cursor: 'pointer' },
+                    })}
+                  />
+                </Spin>
+              </Card>
+            ),
+          },
+          {
+            key: 'reestr',
+            label: <span><UnorderedListOutlined /> Реестр дел</span>,
+            children: (
+              <Card
+                title="Реестр дел"
+                extra={
+                  onNavigate && (
+                    <Button type="primary" size="small" onClick={() => onNavigate('crm-deals')}>
+                      Управление сделками
+                    </Button>
+                  )
+                }
+              >
+                <Spin spinning={dealsLoading}>
+                  <Table
+                    rowKey="id"
+                    columns={reestrColumns}
+                    dataSource={deals}
+                    pagination={{ pageSize: 10, showSizeChanger: true }}
+                  />
+                </Spin>
+              </Card>
+            ),
+          },
+        ]}
+      />
 
       <Modal
-        title="Новый клиент"
+        title={editingClientId ? 'Редактирование клиента' : 'Новый клиент'}
         open={modalVisible}
-        onOk={handleAddClient}
-        onCancel={() => setModalVisible(false)}
+        onOk={editingClientId ? handleUpdateClient : handleAddClient}
+        onCancel={() => { setModalVisible(false); setEditingClientId(null); form.resetFields(); }}
         okText="Сохранить"
         cancelText="Отмена"
       >
@@ -311,8 +417,8 @@ function Clients({ onOpenCard }) {
               <Option value="Частный">Частный</Option>
             </Select>
           </Form.Item>
-          <Form.Item label="Ответственный менеджер" name="manager">
-            <Input />
+          <Form.Item label="Эксперт/специалист" name="manager">
+            <Input placeholder="ФИО ответственного эксперта или специалиста" />
           </Form.Item>
         </Form>
       </Modal>
@@ -321,7 +427,10 @@ function Clients({ onOpenCard }) {
         title={selectedClient ? `Карточка клиента: ${selectedClient.name}` : 'Карточка клиента'}
         open={cardVisible}
         onCancel={() => { setCardVisible(false); setSelectedClient(null); }}
-        footer={[<Button key="close" onClick={() => setCardVisible(false)}>Закрыть</Button>]}
+        footer={[
+          <Button key="edit" type="primary" icon={<EditOutlined />} onClick={openEditClient}>Изменить</Button>,
+          <Button key="close" onClick={() => setCardVisible(false)}>Закрыть</Button>,
+        ]}
         width={640}
       >
         {selectedClient && (
@@ -334,7 +443,7 @@ function Clients({ onOpenCard }) {
                 <Col span={12}><Text type="secondary">Email:</Text></Col><Col span={12}>{selectedClient.email}</Col>
                 <Col span={12}><Text type="secondary">Статус:</Text></Col><Col span={12}><Tag color="#a48752">{selectedClient.status}</Tag></Col>
                 <Col span={12}><Text type="secondary">Сегмент:</Text></Col><Col span={12}>{selectedClient.segment}</Col>
-                <Col span={12}><Text type="secondary">Менеджер:</Text></Col><Col span={12}>{selectedClient.manager}</Col>
+                <Col span={12}><Text type="secondary">Эксперт/специалист:</Text></Col><Col span={12}>{selectedClient.manager}</Col>
               </Row>
             </TabPane>
             <TabPane tab={<span><FileTextOutlined /> Договоры</span>} key="2">

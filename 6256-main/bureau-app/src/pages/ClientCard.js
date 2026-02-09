@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Descriptions, Table, List, Button, Tag, Form, Input, Select, message, Spin } from 'antd';
+import { Card, Tabs, Descriptions, Table, List, Button, Tag, Form, Input, Select, message, Spin, Alert } from 'antd';
 import { ArrowLeftOutlined, MessageOutlined, FileTextOutlined, TeamOutlined } from '@ant-design/icons';
 import { api } from '../api';
 
@@ -50,11 +50,22 @@ export default function ClientCard({ clientId, onClose }) {
     { title: 'Загружен', dataIndex: 'created_at', key: 'created_at', render: (v) => v ? new Date(v).toLocaleDateString('ru-RU') : '—' },
   ];
 
+  const hasOrders = (card.deals && card.deals.length > 0) || (card.communications && card.communications.length > 0);
+  const ordersCount = (card.deals && card.deals.length) || 0;
+
   return (
     <div style={{ padding: 24 }}>
       <Button type="text" icon={<ArrowLeftOutlined />} onClick={onClose} style={{ marginBottom: 16 }}>
         Назад к списку
       </Button>
+      {hasOrders && (
+        <Alert
+          type="info"
+          showIcon
+          message={`Обращался ранее${ordersCount ? ` — заказов/дел: ${ordersCount}` : ''}`}
+          style={{ marginBottom: 16 }}
+        />
+      )}
       <Card title={card.name} extra={<Tag>{card.type}</Tag>}>
         <Tabs
           defaultActiveKey="profile"
@@ -69,7 +80,7 @@ export default function ClientCard({ clientId, onClose }) {
                   <Descriptions.Item label="Email">{card.email || '—'}</Descriptions.Item>
                   <Descriptions.Item label="Статус">{card.status}</Descriptions.Item>
                   <Descriptions.Item label="Сегмент">{card.segment || '—'}</Descriptions.Item>
-                  <Descriptions.Item label="Менеджер">{card.manager || '—'}</Descriptions.Item>
+                  <Descriptions.Item label="Эксперт/специалист">{card.manager || '—'}</Descriptions.Item>
                 </Descriptions>
               ),
             },

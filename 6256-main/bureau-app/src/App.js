@@ -178,7 +178,7 @@ function App() {
       case 'client-card':
         return <ClientCard clientId={currentClientId} onClose={() => setCurrentPage('crm-clients')} />;
       case 'crm-clients':
-        return <Clients onOpenCard={(id) => { setCurrentClientId(id); setCurrentPage('client-card'); }} />;
+        return <Clients onOpenCard={(id) => { setCurrentClientId(id); setCurrentPage('client-card'); }} onNavigate={setCurrentPage} />;
       case 'crm-deals':
         return <Deals />;
       case 'crm-contacts':
@@ -208,7 +208,7 @@ function App() {
       case 'archive-history':
         return <ArchiveHistory />;
       case 'archive-reestr':
-        return <Reestr />;
+        return <Clients defaultTab="reestr" onOpenCard={(id) => { setCurrentClientId(id); setCurrentPage('client-card'); }} onNavigate={setCurrentPage} />;
       case 'finance-ofd':
         return <OFD />;
       case 'finance-edo':
@@ -294,7 +294,7 @@ function App() {
                 Дашборд
               </Menu.Item>
               <SubMenu key="crm-submenu" icon={<UserOutlined />} title="CRM">
-                <Menu.Item key="crm-clients">Клиенты</Menu.Item>
+                <Menu.Item key="crm-clients">Клиенты и реестр</Menu.Item>
                 <Menu.Item key="crm-deals">Сделки</Menu.Item>
                 <Menu.Item key="crm-contacts">Контакты</Menu.Item>
                 <Menu.Item key="crm-history">История</Menu.Item>
@@ -315,7 +315,7 @@ function App() {
                 <Menu.Item key="archive-documents">Документы</Menu.Item>
                 <Menu.Item key="archive-media">Медиа</Menu.Item>
                 <Menu.Item key="archive-history">История</Menu.Item>
-                <Menu.Item key="archive-reestr">Реестр</Menu.Item>
+                <Menu.Item key="archive-reestr">Реестр дел</Menu.Item>
               </SubMenu>
               <SubMenu key="finance-submenu" icon={<DollarOutlined />} title="Финансы">
                 <Menu.Item key="finance-ofd">ОФД</Menu.Item>
@@ -373,7 +373,7 @@ function App() {
             Дашборд
           </Menu.Item>
           <SubMenu key="crm-submenu" icon={<UserOutlined />} title="CRM">
-            <Menu.Item key="crm-clients">Клиенты</Menu.Item>
+            <Menu.Item key="crm-clients">Клиенты и реестр</Menu.Item>
             <Menu.Item key="crm-deals">Сделки</Menu.Item>
             <Menu.Item key="crm-contacts">Контакты</Menu.Item>
             <Menu.Item key="crm-history">История</Menu.Item>
@@ -394,7 +394,7 @@ function App() {
             <Menu.Item key="archive-documents">Документы</Menu.Item>
             <Menu.Item key="archive-media">Медиа</Menu.Item>
             <Menu.Item key="archive-history">История</Menu.Item>
-            <Menu.Item key="archive-reestr">Реестр</Menu.Item>
+            <Menu.Item key="archive-reestr">Реестр дел</Menu.Item>
           </SubMenu>
           <SubMenu key="finance-submenu" icon={<DollarOutlined />} title="Финансы">
             <Menu.Item key="finance-ofd">ОФД</Menu.Item>
@@ -483,7 +483,7 @@ function App() {
             Дашборд
           </Menu.Item>
           <SubMenu key="crm-submenu" icon={<UserOutlined />} title="CRM">
-            <Menu.Item key="crm-clients">Клиенты</Menu.Item>
+            <Menu.Item key="crm-clients">Клиенты и реестр</Menu.Item>
             <Menu.Item key="crm-deals">Сделки</Menu.Item>
             <Menu.Item key="crm-contacts">Контакты</Menu.Item>
             <Menu.Item key="crm-history">История</Menu.Item>
@@ -504,7 +504,7 @@ function App() {
             <Menu.Item key="archive-documents">Документы</Menu.Item>
             <Menu.Item key="archive-media">Медиа</Menu.Item>
             <Menu.Item key="archive-history">История</Menu.Item>
-            <Menu.Item key="archive-reestr">Реестр</Menu.Item>
+            <Menu.Item key="archive-reestr">Реестр дел</Menu.Item>
           </SubMenu>
           <SubMenu key="finance-submenu" icon={<DollarOutlined />} title="Финансы">
             <Menu.Item key="finance-ofd">ОФД</Menu.Item>
