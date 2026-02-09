@@ -8,14 +8,19 @@ const { Option } = Select;
 export default function ClientCard({ clientId, onClose }) {
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [commForm] = Form.useForm();
 
   useEffect(() => {
     if (!clientId) return;
     setLoading(true);
+    setError(false);
     api.getClientCard(clientId)
-      .then(setCard)
-      .catch(() => message.error('Не удалось загрузить карточку'))
+      .then((data) => { setCard(data); setError(false); })
+      .catch(() => {
+        message.error('Не удалось загрузить карточку');
+        setError(true);
+      })
       .finally(() => setLoading(false));
   }, [clientId]);
 
@@ -30,6 +35,23 @@ export default function ClientCard({ clientId, onClose }) {
         .catch(() => message.error('Ошибка'));
     }).catch(() => {});
   };
+
+  if (error) {
+    return (
+      <div style={{ padding: 24 }}>
+        <Button type="text" icon={<ArrowLeftOutlined />} onClick={onClose} style={{ marginBottom: 16 }}>
+          Назад к списку
+        </Button>
+        <Alert
+          type="warning"
+          showIcon
+          message="Карточка не загрузилась"
+          description="Сервер недоступен (на демо-сайте бэкенд не запущен). Запустите приложение локально с бэкендом или попробуйте позже."
+          action={<Button size="small" onClick={onClose}>Вернуться к списку</Button>}
+        />
+      </div>
+    );
+  }
 
   if (loading || !card) {
     return (
