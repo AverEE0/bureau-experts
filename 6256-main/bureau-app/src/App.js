@@ -118,13 +118,28 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // При первой загрузке показывать «Страница не найдена» для неизвестного пути в URL
-  useEffect(() => {
+  const syncPageFromUrl = () => {
     let path = window.location.pathname;
     if (BASE_PATH && path.startsWith(BASE_PATH)) path = path.slice(BASE_PATH.length);
     path = path.replace(/\/$/, '') || '/';
+    const clientMatch = path.match(/^\/crm\/clients\/(\d+)$/);
+    if (clientMatch) {
+      setCurrentPage('client-card');
+      setCurrentClientId(Number(clientMatch[1]));
+      return;
+    }
     const page = PATH_TO_PAGE[path];
     setCurrentPage(page || 'notfound');
+    setCurrentClientId(null);
+  };
+
+  useEffect(() => {
+    syncPageFromUrl();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('popstate', syncPageFromUrl);
+    return () => window.removeEventListener('popstate', syncPageFromUrl);
   }, []);
 
   const PAGE_TO_PATH = {
@@ -176,9 +191,29 @@ function App() {
       case 'dashboard':
         return <Dashboard onNavigate={setCurrentPage} />;
       case 'client-card':
-        return <ClientCard clientId={currentClientId} onClose={() => setCurrentPage('crm-clients')} />;
+        return (
+          <ClientCard
+            clientId={currentClientId}
+            onClose={() => {
+              setCurrentPage('crm-clients');
+              setCurrentClientId(null);
+              const path = (BASE_PATH || '') + '/crm/clients';
+              if (window.history.pushState) window.history.pushState({}, '', path);
+            }}
+          />
+        );
       case 'crm-clients':
-        return <Clients onOpenCard={(id) => { setCurrentClientId(id); setCurrentPage('client-card'); }} onNavigate={setCurrentPage} />;
+        return (
+          <Clients
+            onOpenCard={(id) => {
+              setCurrentClientId(id);
+              setCurrentPage('client-card');
+              const path = BASE_PATH + `/crm/clients/${id}`;
+              if (window.history.pushState) window.history.pushState({}, '', path);
+            }}
+            onNavigate={setCurrentPage}
+          />
+        );
       case 'crm-deals':
         return <Deals />;
       case 'crm-contacts':

@@ -91,7 +91,7 @@ const Dashboard = ({ onNavigate }) => {
                     <Tag color="green">Выполнено: {count}</Tag>
                     <Tag color="blue">Активных: {active}</Tag>
                   </Space>
-                </div>
+                </Space>
               </div>
             ))}
           </Card>
