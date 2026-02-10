@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Bureau Expertov</string>
-    <string name="title_activity_main">Bureau Expertov</string>
+    <string name="app_name">БЮРО ЭКСПЕРТОВ</string>
+    <string name="title_activity_main">БЮРО ЭКСПЕРТОВ</string>
     <string name="package_name">ru.bureau.expertov</string>
     <string name="custom_url_scheme">ru.bureau.expertov</string>
 </resources>

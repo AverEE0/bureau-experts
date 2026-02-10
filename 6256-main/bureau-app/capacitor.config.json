@@ -1,9 +1,1 @@
-{
-  "appId": "ru.bureau.expertov",
-  "appName": "Bureau Expertov",
-  "webDir": "build",
-  "server": {},
-  "android": {
-    "allowMixedContent": true
-  }
-}
+{"appId":"ru.bureau.expertov","appName":"БЮРО ЭКСПЕРТОВ","webDir":"build","server":{},"android":{"allowMixedContent":true}}

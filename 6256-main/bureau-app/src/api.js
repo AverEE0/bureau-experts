@@ -62,7 +62,29 @@ function isNetworkError(err) {
   return err.name === 'TypeError' || msg.includes('failed to fetch') || msg.includes('network');
 }
 
+/** Режим без сервера: тестовые доступы admin/админ, expert/expert — никуда не подключаемся. */
+function isDemoToken(t) {
+  return t === 'demo-admin' || t === 'demo-expert';
+}
+
+function mockDemoResponse(path, method = 'GET') {
+  if (path.includes('unread-count') || path.includes('unread_count')) return { count: 0 };
+  if (path.includes('stats/me')) return { deals_completed: 0, revenue: 0 };
+  if (path.includes('stats/all')) return [];
+  if (path.includes('admin/users') && method === 'GET') return [];
+  if (path.includes('chat/rooms')) return [];
+  if (path.includes('notifications') && method === 'GET') return [];
+  if (path.includes('can-register')) return { can_register: true };
+  if (method === 'GET' && (path.includes('/api/') && !path.includes('auth/login'))) return [];
+  if (method === 'POST' || method === 'PATCH') return { id: 1 };
+  return null;
+}
+
 async function request(path, options = {}, token = getToken()) {
+  if (isDemoToken(token)) {
+    const mock = mockDemoResponse(path, (options.method || 'GET').toUpperCase());
+    return Promise.resolve(mock === undefined ? [] : mock);
+  }
   const base = getApiBase();
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -84,6 +106,9 @@ async function request(path, options = {}, token = getToken()) {
         throw err;
       }
     } else {
+      if (isNetworkError(err)) {
+        throw new Error('Не удалось подключиться к серверу. Проверьте: 1) Запущен ли бэкенд на этом компьютере (порт 8765)? 2) На телефоне — укажите адрес сервера на первом экране.');
+      }
       throw err;
     }
   }
@@ -149,6 +174,7 @@ export const api = {
     return request('/api/documents');
   },
   async suggestDocumentType(file) {
+    if (isDemoToken(getToken())) return { doc_type: 'Другое', provider: 'demo' };
     const form = new FormData();
     form.append('file', file);
     const base = getApiBase();
@@ -158,6 +184,7 @@ export const api = {
     return data;
   },
   async uploadDocument(file, docType, note, clientId, dealId) {
+    if (isDemoToken(getToken())) return { id: 1 };
     const form = new FormData();
     form.append('file', file);
     form.append('doc_type', docType || 'Договор');
@@ -192,7 +219,13 @@ export const api = {
     return r && r.can_register === true;
   },
   async getMe(token) {
-    const res = await fetch(`${getApiBase()}/api/auth/me`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    const t = token || getToken();
+    if (isDemoToken(t)) {
+      return t === 'demo-admin'
+        ? { id: 1, email: 'admin', role: 'admin', full_name: 'Администратор' }
+        : { id: 2, email: 'expert', role: 'manager', full_name: 'Эксперт' };
+    }
+    const res = await fetch(`${getApiBase()}/api/auth/me`, { headers: t ? { Authorization: `Bearer ${t}` } : {} });
     if (res.status === 404 || res.status === 401) return null;
     return res.json();
   },
@@ -203,6 +236,7 @@ export const api = {
     return request(`/api/ocr/document/${docId}`);
   },
   async generateDocument(templateKey, dealId, clientId) {
+    if (isDemoToken(getToken())) throw new Error('В демо-режиме генерация документов недоступна');
     const url = `${getApiBase()}/api/generate/document`;
     const res = await fetch(url, {
       method: 'POST',

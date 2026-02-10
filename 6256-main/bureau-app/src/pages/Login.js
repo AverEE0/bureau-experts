@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, message, Tabs, Typography } from 'antd';
 import { UserOutlined, LockOutlined, IdcardOutlined } from '@ant-design/icons';
-import { api, getServerConnection } from '../api';
+import { api, getToken } from '../api';
 import logoBuro from '../assets/logo-buro.png';
 import './Login.css';
 
@@ -13,12 +13,33 @@ export default function Login({ onLogin }) {
   const [activeTab, setActiveTab] = useState('login');
 
   useEffect(() => {
+    const t = getToken();
+    if (t && (t.startsWith('demo-') || t === 'demo-admin' || t === 'demo-expert')) {
+      setCanRegister(true);
+      return;
+    }
     api.canRegister().then(setCanRegister).catch(() => setCanRegister(false));
   }, []);
 
   const onFinishLogin = async (values) => {
+    const email = (values.email || '').trim().toLowerCase();
+    const password = values.password || '';
     setLoading(true);
     try {
+      if (email === 'admin' && password === 'админ') {
+        const token = 'demo-admin';
+        const user = { id: 1, email: 'admin', role: 'admin', full_name: 'Администратор' };
+        localStorage.setItem('bureau_token', token);
+        onLogin(token, user);
+        return;
+      }
+      if (email === 'expert' && password === 'expert') {
+        const token = 'demo-expert';
+        const user = { id: 2, email: 'expert', role: 'manager', full_name: 'Эксперт' };
+        localStorage.setItem('bureau_token', token);
+        onLogin(token, user);
+        return;
+      }
       const { access_token, user } = await api.login(values.email, values.password);
       localStorage.setItem('bureau_token', access_token);
       onLogin(access_token, user);
@@ -56,11 +77,6 @@ export default function Login({ onLogin }) {
           <Text type="secondary" style={{ display: 'block', marginBottom: 12 }}>
             По умолчанию: admin / админ или expert / expert
           </Text>
-          {typeof window !== 'undefined' && window.Capacitor && !getServerConnection().serverUrl && (
-            <Text type="secondary" style={{ display: 'block', marginBottom: 12, fontSize: 12 }}>
-              На телефоне: укажите адрес сервера в Настройках (меню → Настройки → Подключение к серверу).
-            </Text>
-          )}
           <Form name="login" onFinish={onFinishLogin} size="large" autoComplete="off">
             <Form.Item name="email" rules={[{ required: true, message: 'Введите email' }]}>
               <Input prefix={<UserOutlined />} placeholder="Email" />

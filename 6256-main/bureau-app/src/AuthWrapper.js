@@ -13,6 +13,13 @@ export default function AuthWrapper() {
       setLoading(false);
       return;
     }
+    if (token === 'demo-admin' || token === 'demo-expert') {
+      setUser(token === 'demo-admin'
+        ? { id: 1, email: 'admin', role: 'admin', full_name: 'Администратор' }
+        : { id: 2, email: 'expert', role: 'manager', full_name: 'Эксперт' });
+      setLoading(false);
+      return;
+    }
     api.getMe(token)
       .then((u) => setUser(u))
       .catch(() => setUser(null))
