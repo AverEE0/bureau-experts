@@ -11,18 +11,25 @@ import {
   Modal,
   Form,
   Input,
+  InputNumber,
   Select,
   Tabs,
   List,
   message,
   Spin,
+  Popconfirm,
 } from 'antd';
-import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined, ProfileOutlined, UnorderedListOutlined, EditOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ExportOutlined, UserOutlined, FileTextOutlined, DollarOutlined, MessageOutlined, ProfileOutlined, UnorderedListOutlined, EditOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { api } from '../api';
 
 const { Title, Paragraph, Text } = Typography;
 const { Option } = Select;
 const { TabPane } = Tabs;
+
+const STAGES_DEAL = [
+  'Новый', 'В ожидании', 'В работе', 'Счет', 'Оплачен', 'Не оплачен',
+  'Осмотр', 'Направлен в суд', 'Направлен нотариусу', 'Акт', 'Завершен',
+];
 
 const defaultClients = [
   { id: 1, name: 'Иванов Иван Иванович', type: 'Физ. лицо', inn: '770512345678', phone: '+7 (900) 111-22-33', email: 'ivanov@example.ru', status: 'Активный', segment: 'VIP', manager: 'Петрова Н.В.' },
@@ -42,6 +49,13 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
   const [selectedClient, setSelectedClient] = useState(null);
   const [editingClientId, setEditingClientId] = useState(null);
   const [form] = Form.useForm();
+  const [dealCreateVisible, setDealCreateVisible] = useState(false);
+  const [dealEditVisible, setDealEditVisible] = useState(false);
+  const [dealEditRecord, setDealEditRecord] = useState(null);
+  const [reestrStageFilter, setReestrStageFilter] = useState();
+  const [reestrSearch, setReestrSearch] = useState('');
+  const [dealCreateForm] = Form.useForm();
+  const [dealEditForm] = Form.useForm();
 
   useEffect(() => {
     setLoading(true);
@@ -135,6 +149,99 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
     setModalVisible(true);
   };
 
+  const filteredDealsReestr = useMemo(() => {
+    return deals.filter((d) => {
+      const matchStage = !reestrStageFilter || d.stage === reestrStageFilter;
+      const matchSearch = !reestrSearch || (d.client_name && d.client_name.toLowerCase().includes(reestrSearch.toLowerCase()));
+      return matchStage && matchSearch;
+    });
+  }, [deals, reestrStageFilter, reestrSearch]);
+
+  const handleCreateDeal = () => {
+    dealCreateForm.validateFields().then((values) => {
+      const payload = {
+        client_name: values.client_name,
+        stage: values.stage,
+        sum_rub: values.sum_rub ?? null,
+        date: values.date || null,
+        client_id: values.client_id ?? null,
+      };
+      api.createDeal(payload)
+        .then((newDeal) => {
+          setDeals((prev) => [newDeal, ...prev]);
+          setDealCreateVisible(false);
+          dealCreateForm.resetFields();
+          message.success('Дело добавлено в реестр');
+        })
+        .catch(() => {
+          setDeals((prev) => [{ id: Date.now(), ...payload }, ...prev]);
+          setDealCreateVisible(false);
+          dealCreateForm.resetFields();
+          message.success('Дело добавлено (локально)');
+        });
+    }).catch(() => {});
+  };
+
+  const openEditDeal = (record) => {
+    setDealEditRecord(record);
+    dealEditForm.setFieldsValue({
+      client_name: record.client_name,
+      stage: record.stage,
+      sum_rub: record.sum_rub,
+      date: record.date,
+      client_id: record.client_id ?? undefined,
+    });
+    setDealEditVisible(true);
+  };
+
+  const handleSaveEditDeal = () => {
+    if (!dealEditRecord) return;
+    dealEditForm.validateFields().then((values) => {
+      api.updateDeal(dealEditRecord.id, values)
+        .then((updated) => {
+          setDeals((prev) => prev.map((d) => (d.id === dealEditRecord.id ? updated : d)));
+          setDealEditVisible(false);
+          setDealEditRecord(null);
+          dealEditForm.resetFields();
+          message.success('Изменения сохранены');
+        })
+        .catch(() => {
+          setDeals((prev) => prev.map((d) => (d.id === dealEditRecord.id ? { ...d, ...values } : d)));
+          setDealEditVisible(false);
+          setDealEditRecord(null);
+          dealEditForm.resetFields();
+          message.success('Изменения сохранены локально');
+        });
+    }).catch(() => {});
+  };
+
+  const handleDeleteDeal = (record) => {
+    api.deleteDeal(record.id)
+      .then(() => {
+        setDeals((prev) => prev.filter((d) => d.id !== record.id));
+        message.success('Дело удалено из реестра');
+      })
+      .catch(() => message.error('Не удалось удалить'));
+  };
+
+  const exportDealsCsv = () => {
+    const headers = ['Клиент', 'Этап', 'Сумма (₽)', 'Дата'];
+    const rows = filteredDealsReestr.map((d) =>
+      [d.client_name, d.stage, d.sum_rub != null ? d.sum_rub : '', d.date]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(',')
+    );
+    const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `реестр_дел_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    message.success('Экспорт выполнен');
+  };
+
   const columns = [
     {
       title: 'Клиент',
@@ -207,18 +314,25 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
     {
       title: 'Действия',
       key: 'actions',
+      width: 220,
       render: (_, record) => (
-        <Space>
+        <Space wrap>
           {record.client_id && onOpenCard && (
             <Button type="link" size="small" icon={<UserOutlined />} onClick={() => onOpenCard(record.client_id)}>
-              Карточка клиента
+              Карточка
             </Button>
           )}
-          {onNavigate && (
-            <Button type="link" size="small" icon={<EditOutlined />} onClick={() => onNavigate('crm-deals')}>
-              Изменить
-            </Button>
-          )}
+          <Button type="link" size="small" icon={<EditOutlined />} onClick={() => openEditDeal(record)}>
+            Редактировать
+          </Button>
+          <Popconfirm
+            title="Удалить дело из реестра?"
+            onConfirm={() => handleDeleteDeal(record)}
+            okText="Удалить"
+            cancelText="Отмена"
+          >
+            <Button type="link" size="small" danger icon={<DeleteOutlined />}>Удалить</Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -326,18 +440,38 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
               <Card
                 title="Реестр дел"
                 extra={
-                  onNavigate && (
-                    <Button type="primary" size="small" onClick={() => onNavigate('crm-deals')}>
-                      Управление сделками
+                  <Space wrap>
+                    <Button type="primary" size="small" icon={<PlusOutlined />} onClick={() => setDealCreateVisible(true)}>
+                      Добавить дело
                     </Button>
-                  )
+                    <Input
+                      placeholder="Поиск по клиенту"
+                      value={reestrSearch}
+                      onChange={(e) => setReestrSearch(e.target.value)}
+                      style={{ width: 180 }}
+                      allowClear
+                    />
+                    <Select
+                      placeholder="Этап"
+                      allowClear
+                      style={{ width: 160 }}
+                      value={reestrStageFilter}
+                      onChange={setReestrStageFilter}
+                    >
+                      {STAGES_DEAL.map((s) => (
+                        <Option key={s} value={s}>{s}</Option>
+                      ))}
+                    </Select>
+                    <Button size="small" icon={<ReloadOutlined />} onClick={loadDeals}>Обновить</Button>
+                    <Button size="small" onClick={exportDealsCsv}>Экспорт CSV</Button>
+                  </Space>
                 }
               >
                 <Spin spinning={dealsLoading}>
                   <Table
                     rowKey="id"
                     columns={reestrColumns}
-                    dataSource={deals}
+                    dataSource={filteredDealsReestr}
                     pagination={{ pageSize: 10, showSizeChanger: true }}
                   />
                 </Spin>
@@ -483,6 +617,76 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
             </TabPane>
           </Tabs>
         )}
+      </Modal>
+
+      <Modal
+        title="Добавить дело в реестр"
+        open={dealCreateVisible}
+        onOk={handleCreateDeal}
+        onCancel={() => { setDealCreateVisible(false); dealCreateForm.resetFields(); }}
+        okText="Добавить"
+        cancelText="Отмена"
+      >
+        <Form layout="vertical" form={dealCreateForm}>
+          <Form.Item name="client_id" label="Привязать к клиенту">
+            <Select
+              allowClear
+              placeholder="Выберите клиента (необязательно)"
+              onChange={(id) => {
+                const c = clients.find((x) => x.id === id);
+                if (c) dealCreateForm.setFieldsValue({ client_name: c.name });
+              }}
+            >
+              {clients.map((c) => (
+                <Option key={c.id} value={c.id}>{c.name}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="client_name" label="Заказчик / ФИО" rules={[{ required: true, message: 'Укажите заказчика' }]}>
+            <Input placeholder="Наименование или ФИО" />
+          </Form.Item>
+          <Form.Item name="stage" label="Этап" rules={[{ required: true }]} initialValue="Новый">
+            <Select>
+              {STAGES_DEAL.map((s) => (
+                <Option key={s} value={s}>{s}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="sum_rub" label="Сумма (₽)">
+            <InputNumber min={0} style={{ width: '100%' }} placeholder="Необязательно" />
+          </Form.Item>
+          <Form.Item name="date" label="Дата">
+            <Input placeholder="ГГГГ-ММ-ДД" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <Modal
+        title="Редактировать дело"
+        open={dealEditVisible}
+        onOk={handleSaveEditDeal}
+        onCancel={() => { setDealEditVisible(false); setDealEditRecord(null); dealEditForm.resetFields(); }}
+        okText="Сохранить"
+        cancelText="Отмена"
+      >
+        <Form layout="vertical" form={dealEditForm}>
+          <Form.Item name="client_name" label="Заказчик / ФИО" rules={[{ required: true, message: 'Укажите заказчика' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="stage" label="Этап" rules={[{ required: true }]}>
+            <Select>
+              {STAGES_DEAL.map((s) => (
+                <Option key={s} value={s}>{s}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="sum_rub" label="Сумма (₽)">
+            <InputNumber min={0} style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="date" label="Дата">
+            <Input placeholder="ГГГГ-ММ-ДД" />
+          </Form.Item>
+        </Form>
       </Modal>
     </div>
   );
