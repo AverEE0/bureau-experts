@@ -22,7 +22,7 @@ import {
 } from '@ant-design/icons';
 import logoBuro from './assets/logo-buro.png';
 import Dashboard from './pages/Dashboard';
-import PersonalCabinet from './pages/PersonalCabinet';
+import PersonalCabinet from './pages/PersonalCabinet.js';
 import Admin from './pages/Admin';
 import Clients from './pages/Clients';
 import ClientCard from './pages/ClientCard';
