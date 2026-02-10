@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: 6256-main/bureau-app/package-lock.json
 
       - name: Install deps and build web + sync Android
+        env:
+          CI: ''
         run: |
           cd 6256-main/bureau-app
           npm ci
