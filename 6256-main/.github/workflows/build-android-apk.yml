@@ -16,11 +16,11 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: bureau-app/package-lock.json
+          cache-dependency-path: 6256-main/bureau-app/package-lock.json
 
       - name: Install deps and build web + sync Android
         run: |
-          cd bureau-app
+          cd 6256-main/bureau-app
           npm ci
           npm run build:android
 
@@ -38,7 +38,7 @@ jobs:
 
       - name: Build debug APK
         run: |
-          cd bureau-app/android
+          cd 6256-main/bureau-app/android
           chmod +x gradlew
           export ANDROID_HOME="${ANDROID_SDK_ROOT:-$HOME/.android/sdk}"
           ./gradlew assembleDebug --no-daemon
@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bureau-expertov-apk
-          path: bureau-app/android/app/build/outputs/apk/debug/app-debug.apk
+          path: 6256-main/bureau-app/android/app/build/outputs/apk/debug/app-debug.apk
