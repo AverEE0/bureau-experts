@@ -360,9 +360,28 @@ a:hover,
   .app-header .header-right-block {
     min-width: 0 !important;
     flex-shrink: 0;
+    max-width: 50%;
   }
   .app-header .header-user-name {
     display: none;
+  }
+  .app-header .header-logout-btn {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 12px !important;
+  }
+  .app-header .ant-badge {
+    flex-shrink: 0;
+  }
+  .ant-drawer .ant-drawer-header {
+    background: #404040 !important;
+    border-bottom-color: #555 !important;
+  }
+  .ant-drawer .ant-drawer-title {
+    color: #fff !important;
+  }
+  .ant-drawer .ant-drawer-close {
+    color: rgba(255,255,255,0.85) !important;
   }
   .dashboard-content-full {
     padding: 12px;

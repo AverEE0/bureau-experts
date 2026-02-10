@@ -457,14 +457,22 @@ function App({ user = null, onLogout = () => {} }) {
         </Sider>
       )}
       <Drawer
-        title="Экспертная Платформа"
+        title="Меню"
         placement="left"
         onClose={() => setDrawerVisible(false)}
         open={drawerVisible}
         width={280}
-        bodyStyle={{ padding: 0 }}
+        bodyStyle={{ padding: 0, background: '#404040' }}
+        styles={{ body: { background: '#404040' } }}
       >
-        <Menu mode="inline" selectedKeys={[currentPage]} onClick={handleMenuClick} style={{ borderRight: 0, background: 'transparent' }}>
+        <Menu
+          mode="inline"
+          selectedKeys={[currentPage]}
+          onClick={handleMenuClick}
+          style={{ borderRight: 0, background: '#404040' }}
+          theme="dark"
+          defaultOpenKeys={isMobile ? ['crm-submenu', 'documents-submenu', 'cycles-submenu', 'archive-submenu', 'finance-submenu', 'communication-submenu', 'reports-submenu'] : undefined}
+        >
           <Menu.Item key="dashboard" icon={<HomeOutlined />}>
             Дашборд
           </Menu.Item>
@@ -558,12 +566,12 @@ function App({ user = null, onLogout = () => {} }) {
               <span className="header-org-full">СУДЕБНО-ЭКСПЕРТНЫЙ ЦЕНТР «БЮРО ЭКСПЕРТОВ»</span>
               <img src={`${process.env.PUBLIC_URL || ''}/emblem.png`} alt="" className="header-emblem-img" />
             </div>
-            <Space size="small" className="header-right-block" style={{ minWidth: 220, justifyContent: 'flex-end', flexShrink: 0 }}>
+            <Space size="small" className="header-right-block" style={{ flexShrink: 0, gap: 4 }}>
               <Badge count={unreadCount} size="small">
                 <BellOutlined className="header-icon-dark" style={{ fontSize: 20 }} />
               </Badge>
               <span className="header-user-name" style={{ fontSize: 13, color: '#333' }}>{user?.full_name || user?.email}</span>
-              <Button type="primary" size="small" icon={<LogoutOutlined />} onClick={onLogout}>Выйти</Button>
+              <Button type="primary" size="small" className="header-logout-btn" icon={<LogoutOutlined />} onClick={onLogout}>Выйти</Button>
             </Space>
           </Header>
         </div>
@@ -592,73 +600,6 @@ function App({ user = null, onLogout = () => {} }) {
           <strong>{ORG_NAME}</strong> — © 2026. Все права защищены. Соответствует ФЗ-152, ФЗ-73, ФЗ-135.
         </div>
       </Footer>
-      <Drawer
-        title="Меню"
-        placement="left"
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-        bodyStyle={{ padding: 0 }}
-      >
-        <Menu mode="inline" selectedKeys={[currentPage]} onClick={handleMenuClick} style={{ borderRight: 0, background: 'transparent' }} theme="dark">
-          <Menu.Item key="dashboard" icon={<HomeOutlined />}>
-            Дашборд
-          </Menu.Item>
-          <SubMenu key="crm-submenu" icon={<UserOutlined />} title="CRM">
-            <Menu.Item key="crm-clients">Клиенты и реестр</Menu.Item>
-            <Menu.Item key="crm-deals">Сделки</Menu.Item>
-            <Menu.Item key="crm-contacts">Контакты</Menu.Item>
-            <Menu.Item key="crm-history">История</Menu.Item>
-          </SubMenu>
-          <SubMenu key="documents-submenu" icon={<FileTextOutlined />} title="Документооборот">
-            <Menu.Item key="documents">Документы</Menu.Item>
-            <Menu.Item key="documents-ocr">OCR</Menu.Item>
-            <Menu.Item key="documents-templates">Шаблоны</Menu.Item>
-            <Menu.Item key="documents-signatures">Подписи</Menu.Item>
-          </SubMenu>
-          <SubMenu key="cycles-submenu" icon={<FolderOpenOutlined />} title="Бизнес-циклы">
-            <Menu.Item key="cycles-expertise">Экспертиза</Menu.Item>
-            <Menu.Item key="cycles-valuation">Оценка</Menu.Item>
-            <Menu.Item key="cycles-legal">Юридические услуги</Menu.Item>
-            <Menu.Item key="cycles-realty">Недвижимость</Menu.Item>
-          </SubMenu>
-          <SubMenu key="archive-submenu" icon={<FolderOpenOutlined />} title="Архив">
-            <Menu.Item key="archive-documents">Документы</Menu.Item>
-            <Menu.Item key="archive-media">Медиа</Menu.Item>
-            <Menu.Item key="archive-history">История</Menu.Item>
-            <Menu.Item key="archive-reestr">Реестр дел</Menu.Item>
-          </SubMenu>
-          <SubMenu key="finance-submenu" icon={<DollarOutlined />} title="Финансы">
-            <Menu.Item key="finance-ofd">ОФД</Menu.Item>
-            <Menu.Item key="finance-edo">ЭДО</Menu.Item>
-            <Menu.Item key="finance-1c">1C</Menu.Item>
-            <Menu.Item key="finance-banks">Банки</Menu.Item>
-          </SubMenu>
-          <SubMenu key="communication-submenu" icon={<MessageOutlined />} title="Omnichannel Связь">
-            <Menu.Item key="omnichannel-telegram">Telegram</Menu.Item>
-            <Menu.Item key="omnichannel-max">MAX</Menu.Item>
-            <Menu.Item key="omnichannel-bip">BIP</Menu.Item>
-            <Menu.Item key="omnichannel-sms">SMS</Menu.Item>
-            <Menu.Item key="omnichannel-email">Email</Menu.Item>
-            <Menu.Item key="omnichannel-calls">Звонки</Menu.Item>
-          </SubMenu>
-          <SubMenu key="reports-submenu" icon={<BarChartOutlined />} title="Отчеты">
-            <Menu.Item key="reports-financial">Финансовые</Menu.Item>
-            <Menu.Item key="reports-operational">Операционные</Menu.Item>
-            <Menu.Item key="reports-analytics">Аналитика</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="settings" icon={<SettingOutlined />}>
-            Настройки
-          </Menu.Item>
-          {user?.role === 'admin' && (
-            <Menu.Item key="admin" icon={<TeamOutlined />}>
-              Администрирование
-            </Menu.Item>
-          )}
-          <Menu.Item key="internal-chat" icon={<CommentOutlined />}>
-            Внутренняя переписка
-          </Menu.Item>
-        </Menu>
-      </Drawer>
     </Layout>
   );
 }
