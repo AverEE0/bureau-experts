@@ -31,6 +31,15 @@ const STAGES_DEAL = [
   'Осмотр', 'Направлен в суд', 'Направлен нотариусу', 'Акт', 'Завершен',
 ];
 
+const SERVICE_NAMES = [
+  'Оценка',
+  'Экспертиза',
+  'Перевод',
+  'Кадастровые работы',
+  'Геодезия',
+  'Юридические услуги',
+];
+
 const defaultClients = [
   { id: 1, name: 'Иванов Иван Иванович', type: 'Физ. лицо', inn: '770512345678', phone: '+7 (900) 111-22-33', email: 'ivanov@example.ru', status: 'Активный', segment: 'VIP', manager: 'Петрова Н.В.' },
   { id: 2, name: 'ООО "Ромашка"', type: 'Юр. лицо', inn: '7708123456', phone: '+7 (900) 222-33-44', email: 'info@romashka.ru', status: 'Новый', segment: 'Корпоративный', manager: 'Иванов С.А.' },
@@ -165,6 +174,13 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
         sum_rub: values.sum_rub ?? null,
         date: values.date || null,
         client_id: values.client_id ?? null,
+        number: values.number || null,
+        contacts: values.contacts || null,
+        service_name: values.service_name || null,
+        object_address: values.object_address || null,
+        inspection: values.inspection || null,
+        court_assigned: values.court_assigned || null,
+        petition: values.petition || null,
       };
       api.createDeal(payload)
         .then((newDeal) => {
@@ -190,6 +206,13 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
       sum_rub: record.sum_rub,
       date: record.date,
       client_id: record.client_id ?? undefined,
+      number: record.number ?? undefined,
+      contacts: record.contacts ?? undefined,
+      service_name: record.service_name ?? undefined,
+      object_address: record.object_address ?? undefined,
+      inspection: record.inspection ?? undefined,
+      court_assigned: record.court_assigned ?? undefined,
+      petition: record.petition ?? undefined,
     });
     setDealEditVisible(true);
   };
@@ -225,10 +248,10 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
   };
 
   const exportDealsCsv = () => {
-    const headers = ['Клиент', 'Этап', 'Сумма (₽)', 'Дата'];
+    const headers = ['№', 'Наименование (Ф.И.О)', 'Дата поступления', 'Контакты', 'Наименование услуги', 'Адрес объекта', 'Осмотр', 'Назначенное судом', 'Ходатайство', 'Этап', 'Сумма (₽)'];
     const rows = filteredDealsReestr.map((d) =>
-      [d.client_name, d.stage, d.sum_rub != null ? d.sum_rub : '', d.date]
-        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+      [d.number, d.client_name, d.date, d.contacts, d.service_name, d.object_address, d.inspection, d.court_assigned, d.petition, d.stage, d.sum_rub != null ? d.sum_rub : '']
+        .map((v) => `"${String(v != null ? v : '').replace(/"/g, '""')}"`)
         .join(',')
     );
     const csv = '\uFEFF' + [headers.join(','), ...rows].join('\n');
@@ -307,14 +330,20 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
   ];
 
   const reestrColumns = [
-    { title: 'Клиент', dataIndex: 'client_name', key: 'client_name' },
-    { title: 'Этап', dataIndex: 'stage', key: 'stage', render: (s) => <Tag color="#333">{s}</Tag> },
-    { title: 'Сумма', dataIndex: 'sum_rub', key: 'sum_rub', render: (v) => v != null ? `${Number(v).toLocaleString('ru-RU')} ₽` : '—' },
-    { title: 'Дата', dataIndex: 'date', key: 'date' },
+    { title: '№', dataIndex: 'number', key: 'number', width: 90, ellipsis: true },
+    { title: 'Наименование (Ф.И.О)', dataIndex: 'client_name', key: 'client_name', ellipsis: true },
+    { title: 'Дата поступления', dataIndex: 'date', key: 'date', width: 120 },
+    { title: 'Контакты', dataIndex: 'contacts', key: 'contacts', width: 140, ellipsis: true, render: (v) => v || '—' },
+    { title: 'Наименование услуги', dataIndex: 'service_name', key: 'service_name', width: 140, render: (v) => v || '—' },
+    { title: 'Адрес объекта', dataIndex: 'object_address', key: 'object_address', width: 160, ellipsis: true, render: (v) => v || '—' },
+    { title: 'Осмотр', dataIndex: 'inspection', key: 'inspection', width: 100, render: (v) => v || '—' },
+    { title: 'Назначенное судом', dataIndex: 'court_assigned', key: 'court_assigned', width: 140, ellipsis: true, render: (v) => v || '—' },
+    { title: 'Ходатайство', dataIndex: 'petition', key: 'petition', width: 120, ellipsis: true, render: (v) => v || '—' },
     {
       title: 'Действия',
       key: 'actions',
-      width: 220,
+      width: 200,
+      fixed: 'right',
       render: (_, record) => (
         <Space wrap>
           {record.client_id && onOpenCard && (
@@ -473,6 +502,7 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
                     columns={reestrColumns}
                     dataSource={filteredDealsReestr}
                     pagination={{ pageSize: 10, showSizeChanger: true }}
+                    scroll={{ x: 1300 }}
                   />
                 </Spin>
               </Card>
@@ -626,6 +656,7 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
         onCancel={() => { setDealCreateVisible(false); dealCreateForm.resetFields(); }}
         okText="Добавить"
         cancelText="Отмена"
+        width={560}
       >
         <Form layout="vertical" form={dealCreateForm}>
           <Form.Item name="client_id" label="Привязать к клиенту">
@@ -634,7 +665,10 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
               placeholder="Выберите клиента (необязательно)"
               onChange={(id) => {
                 const c = clients.find((x) => x.id === id);
-                if (c) dealCreateForm.setFieldsValue({ client_name: c.name });
+                if (c) dealCreateForm.setFieldsValue({
+                  client_name: c.name,
+                  contacts: [c.phone, c.email].filter(Boolean).join(', ') || undefined,
+                });
               }}
             >
               {clients.map((c) => (
@@ -642,8 +676,36 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="client_name" label="Заказчик / ФИО" rules={[{ required: true, message: 'Укажите заказчика' }]}>
+          <Form.Item name="number" label="№ дела">
+            <Input placeholder="Поочерёдная с начала года (необязательно)" />
+          </Form.Item>
+          <Form.Item name="client_name" label="Наименование (Ф.И.О)" rules={[{ required: true, message: 'Укажите заказчика' }]}>
             <Input placeholder="Наименование или ФИО" />
+          </Form.Item>
+          <Form.Item name="date" label="Дата поступления">
+            <Input placeholder="ГГГГ-ММ-ДД" />
+          </Form.Item>
+          <Form.Item name="contacts" label="Контакты">
+            <Input placeholder="Телефон, email" />
+          </Form.Item>
+          <Form.Item name="service_name" label="Наименование услуги">
+            <Select allowClear placeholder="Выберите услугу">
+              {SERVICE_NAMES.map((s) => (
+                <Option key={s} value={s}>{s}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="object_address" label="Адрес объекта">
+            <Input placeholder="Адрес объекта" />
+          </Form.Item>
+          <Form.Item name="inspection" label="Осмотр">
+            <Input placeholder="Дата / да / нет (по умолчанию НЕТ)" />
+          </Form.Item>
+          <Form.Item name="court_assigned" label="Назначенное судом">
+            <Input placeholder="Наименование суда, скан постановления" />
+          </Form.Item>
+          <Form.Item name="petition" label="Ходатайство">
+            <Input placeholder="Дата и прикреплённый документ" />
           </Form.Item>
           <Form.Item name="stage" label="Этап" rules={[{ required: true }]} initialValue="Новый">
             <Select>
@@ -655,9 +717,6 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
           <Form.Item name="sum_rub" label="Сумма (₽)">
             <InputNumber min={0} style={{ width: '100%' }} placeholder="Необязательно" />
           </Form.Item>
-          <Form.Item name="date" label="Дата">
-            <Input placeholder="ГГГГ-ММ-ДД" />
-          </Form.Item>
         </Form>
       </Modal>
 
@@ -668,10 +727,39 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
         onCancel={() => { setDealEditVisible(false); setDealEditRecord(null); dealEditForm.resetFields(); }}
         okText="Сохранить"
         cancelText="Отмена"
+        width={560}
       >
         <Form layout="vertical" form={dealEditForm}>
-          <Form.Item name="client_name" label="Заказчик / ФИО" rules={[{ required: true, message: 'Укажите заказчика' }]}>
+          <Form.Item name="number" label="№ дела">
+            <Input placeholder="Поочерёдная с начала года" />
+          </Form.Item>
+          <Form.Item name="client_name" label="Наименование (Ф.И.О)" rules={[{ required: true, message: 'Укажите заказчика' }]}>
             <Input />
+          </Form.Item>
+          <Form.Item name="date" label="Дата поступления">
+            <Input placeholder="ГГГГ-ММ-ДД" />
+          </Form.Item>
+          <Form.Item name="contacts" label="Контакты">
+            <Input placeholder="Телефон, email" />
+          </Form.Item>
+          <Form.Item name="service_name" label="Наименование услуги">
+            <Select allowClear placeholder="Выберите услугу">
+              {SERVICE_NAMES.map((s) => (
+                <Option key={s} value={s}>{s}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="object_address" label="Адрес объекта">
+            <Input />
+          </Form.Item>
+          <Form.Item name="inspection" label="Осмотр">
+            <Input placeholder="Дата / да / нет" />
+          </Form.Item>
+          <Form.Item name="court_assigned" label="Назначенное судом">
+            <Input placeholder="Наименование суда, скан постановления" />
+          </Form.Item>
+          <Form.Item name="petition" label="Ходатайство">
+            <Input placeholder="Дата и документ" />
           </Form.Item>
           <Form.Item name="stage" label="Этап" rules={[{ required: true }]}>
             <Select>
@@ -682,9 +770,6 @@ function Clients({ onOpenCard, defaultTab = 'base', onNavigate }) {
           </Form.Item>
           <Form.Item name="sum_rub" label="Сумма (₽)">
             <InputNumber min={0} style={{ width: '100%' }} />
-          </Form.Item>
-          <Form.Item name="date" label="Дата">
-            <Input placeholder="ГГГГ-ММ-ДД" />
           </Form.Item>
         </Form>
       </Modal>

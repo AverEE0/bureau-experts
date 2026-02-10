@@ -3,13 +3,17 @@ import hashlib
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import engine, Base, SessionLocal, _ensure_document_columns
+from database import engine, Base, SessionLocal, _ensure_document_columns, _ensure_deal_columns
 from models import Client, Deal, Document, Communication, User, IntegrationConfig
 from routers import clients, deals, documents, communications, auth, fns, ocr, generate, archive, integrations, signatures, dashboard
 
 Base.metadata.create_all(bind=engine)
 try:
     _ensure_document_columns()
+except Exception:
+    pass
+try:
+    _ensure_deal_columns()
 except Exception:
     pass
 

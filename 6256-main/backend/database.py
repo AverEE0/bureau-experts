@@ -28,6 +28,26 @@ def _ensure_document_columns():
                 conn.rollback()
 
 
+def _ensure_deal_columns():
+    """Добавить колонки реестра в deals для существующих БД (SQLite)."""
+    adds = [
+        ("deals", "number", "TEXT"),
+        ("deals", "contacts", "TEXT"),
+        ("deals", "service_name", "TEXT"),
+        ("deals", "object_address", "TEXT"),
+        ("deals", "inspection", "TEXT"),
+        ("deals", "court_assigned", "TEXT"),
+        ("deals", "petition", "TEXT"),
+    ]
+    with engine.connect() as conn:
+        for table, col, ctype in adds:
+            try:
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {ctype}"))
+                conn.commit()
+            except Exception:
+                conn.rollback()
+
+
 def get_db():
     db = SessionLocal()
     try:

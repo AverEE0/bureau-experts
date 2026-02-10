@@ -44,6 +44,13 @@ class DealBase(BaseModel):
     sum_rub: Optional[float] = None
     date: Optional[str] = None
     client_id: Optional[int] = None
+    number: Optional[str] = None
+    contacts: Optional[str] = None
+    service_name: Optional[str] = None
+    object_address: Optional[str] = None
+    inspection: Optional[str] = None
+    court_assigned: Optional[str] = None
+    petition: Optional[str] = None
 
 
 class DealCreate(DealBase):
@@ -56,6 +63,13 @@ class DealUpdate(BaseModel):
     sum_rub: Optional[float] = None
     date: Optional[str] = None
     client_id: Optional[int] = None
+    number: Optional[str] = None
+    contacts: Optional[str] = None
+    service_name: Optional[str] = None
+    object_address: Optional[str] = None
+    inspection: Optional[str] = None
+    court_assigned: Optional[str] = None
+    petition: Optional[str] = None
 
 
 class DealResponse(DealBase):

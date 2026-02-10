@@ -29,11 +29,19 @@ class Deal(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     client_id = Column(Integer, ForeignKey("clients.id"), nullable=True)
-    client_name = Column(String(255), nullable=False)  # denormalized for list
+    client_name = Column(String(255), nullable=False)  # Наименование (Ф.И.О)
     stage = Column(String(128), nullable=False)
     sum_rub = Column(Float, nullable=True)
-    date = Column(String(32), nullable=True)  # YYYY-MM-DD
+    date = Column(String(32), nullable=True)  # Дата поступления YYYY-MM-DD
     created_at = Column(DateTime, default=datetime.utcnow)
+    # Поля реестра по образцу
+    number = Column(String(64), nullable=True)  # № дела (поочерёдная с начала года)
+    contacts = Column(String(512), nullable=True)  # Контакты
+    service_name = Column(String(255), nullable=True)  # Наименование услуги
+    object_address = Column(String(512), nullable=True)  # Адрес объекта
+    inspection = Column(String(255), nullable=True)  # Осмотр (дата/да/нет)
+    court_assigned = Column(String(512), nullable=True)  # Назначенное судом (наименование, скан)
+    petition = Column(String(512), nullable=True)  # Ходатайство (дата и документ)
 
     client = relationship("Client", back_populates="deals", foreign_keys=[client_id])
 
