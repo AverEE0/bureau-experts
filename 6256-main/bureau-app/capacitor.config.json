@@ -1,0 +1,9 @@
+{
+  "appId": "ru.bureau.expertov",
+  "appName": "Bureau Expertov",
+  "webDir": "build",
+  "server": {},
+  "android": {
+    "allowMixedContent": true
+  }
+}
