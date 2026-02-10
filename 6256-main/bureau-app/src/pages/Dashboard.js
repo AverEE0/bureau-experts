@@ -62,42 +62,42 @@ const Dashboard = ({ onNavigate, onOpenCard }) => {
         </Card>
       )}
 
-      <Row gutter={24}>
-        <Col span={6}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card>
             <Statistic title="Активные дела" value={43} prefix={<FileTextOutlined />} valueStyle={{ color: '#a48752' }} />
             <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-deals')}>Перейти к делам</Button>
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card>
             <Statistic title="Клиенты" value={lastClients.length > 0 ? lastClients.length : '—'} prefix={<TeamOutlined />} valueStyle={{ color: '#a48752' }} />
             <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-clients')}>Перейти</Button>
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card>
             <Statistic title="Доходы" value={income} prefix={<RiseOutlined />} suffix="₽" valueStyle={{ color: '#52c41a' }} />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={12} lg={6}>
           <Card>
             <Statistic title="Расходы" value={expenses} prefix={<FallOutlined />} suffix="₽" valueStyle={{ color: '#ff4d4f' }} />
           </Card>
         </Col>
       </Row>
 
-      <Row gutter={24} style={{ marginTop: 24 }}>
-        <Col span={12}>
+      <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+        <Col xs={24} lg={12}>
           <Card
             title="Выполнено дел по деятельности"
             extra={<Button type="link" onClick={() => onNavigate && onNavigate('crm-deals')}>К делам</Button>}
           >
             {completedByActivity.map(({ activity, count, active }) => (
               <div key={activity} style={{ marginBottom: 12 }}>
-                <Space style={{ width: '100%', justifyContent: 'space-between' }} wrap>
-                  <Text>{activity}</Text>
-                  <Space>
+                <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                  <Text style={{ wordBreak: 'break-word' }}>{activity}</Text>
+                  <Space wrap size={8}>
                     <Tag color="green">Выполнено: {count}</Tag>
                     <Button type="link" size="small" onClick={() => onNavigate && onNavigate('crm-deals')}>
                       <Tag color="blue">Активных: {active} → к делам</Tag>
@@ -108,7 +108,7 @@ const Dashboard = ({ onNavigate, onOpenCard }) => {
             ))}
           </Card>
         </Col>
-        <Col span={12}>
+        <Col xs={24} lg={12}>
           <Card title="Динамика доходов и дел с начала года">
             <Space style={{ marginBottom: 12 }}>
               <Text>Год:</Text>
@@ -129,19 +129,19 @@ const Dashboard = ({ onNavigate, onOpenCard }) => {
         </Col>
       </Row>
 
-      <Row gutter={24} style={{ marginTop: 24 }}>
-        <Col span={8}>
+      <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+        <Col xs={24} sm={24} md={8}>
           <Card
             title="Карточка предприятия"
             extra={<Button type="link" onClick={() => onNavigate && onNavigate('settings')}>Настройки</Button>}
           >
             <Space direction="vertical">
-              <Text strong>СЭЦ «БЮРО ЭКСПЕРТОВ»</Text>
-              <Text type="secondary">Судебная экспертиза, оценка, юридические услуги</Text>
+              <Text strong style={{ wordBreak: 'break-word' }}>СЭЦ «БЮРО ЭКСПЕРТОВ»</Text>
+              <Text type="secondary" style={{ wordBreak: 'break-word' }}>Судебная экспертиза, оценка, юридические услуги</Text>
             </Space>
           </Card>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={24} md={8}>
           <Card
             title="Последние 10 клиентов"
             extra={<Button type="link" onClick={() => onNavigate && onNavigate('crm-clients')}>Все</Button>}
@@ -182,7 +182,7 @@ const Dashboard = ({ onNavigate, onOpenCard }) => {
             />
           </Card>
         </Col>
-        <Col span={8}>
+        <Col xs={24} sm={24} md={8}>
           <Card title="Архив и Финансы" extra={<Button type="link" onClick={() => onNavigate && onNavigate('finance-ofd')}>Интеграции</Button>}>
             <Space direction="vertical" size="small">
               <div>

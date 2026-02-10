@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import 'antd/dist/reset.css';
 import './App.css';
-import { Layout, Menu, Space, Avatar, Drawer, Button } from 'antd';
+import { Layout, Menu, Space, Drawer, Button, Badge, Alert } from 'antd';
+import { getServerConnection, isOfflineFallback } from './api';
 import {
   UserOutlined,
   FileTextOutlined,
@@ -15,9 +16,14 @@ import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
   CommentOutlined,
+  LogoutOutlined,
+  IdcardOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import logoBuro from './assets/logo-buro.png';
 import Dashboard from './pages/Dashboard';
+import PersonalCabinet from './pages/PersonalCabinet';
+import Admin from './pages/Admin';
 import Clients from './pages/Clients';
 import ClientCard from './pages/ClientCard';
 import Deals from './pages/Deals';
@@ -34,7 +40,6 @@ import Realty from './pages/Realty';
 import ArchiveDocs from './pages/ArchiveDocs';
 import Media from './pages/Media';
 import ArchiveHistory from './pages/ArchiveHistory';
-import Reestr from './pages/Reestr';
 import OFD from './pages/OFD';
 import EDO from './pages/EDO';
 import OneC from './pages/OneC';
@@ -97,17 +102,21 @@ const PATH_TO_PAGE = {
   '/reports/analytics': 'reports-analytics',
   '/settings': 'settings',
   '/internal-chat': 'internal-chat',
+  '/cabinet': 'cabinet',
+  '/admin': 'admin',
 };
 const { SubMenu } = Menu;
 
 const ORG_NAME = 'СЭЦ «БЮРО ЭКСПЕРТОВ»';
 
-function App() {
+function App({ user = null, onLogout = () => {} }) {
   const [currentPage, setCurrentPage] = useState('dashboard');
+  const [unreadCount, setUnreadCount] = useState(0);
   const [currentClientId, setCurrentClientId] = useState(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [siderCollapsed, setSiderCollapsed] = useState(false);
+  const [serverOffline, setServerOffline] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -175,7 +184,44 @@ function App() {
     'reports-analytics': '/reports/analytics',
     settings: '/settings',
     'internal-chat': '/internal-chat',
+    cabinet: '/cabinet',
+    admin: '/admin',
   };
+
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      try {
+        const r = await (await import('./api')).default.getUnreadCount();
+        setUnreadCount(r.count || 0);
+      } catch (_) {}
+    };
+    load();
+    const t = setInterval(load, 60000);
+    return () => clearInterval(t);
+  }, [user]);
+
+  // Проверка доступности сервера при режиме «общая база»
+  useEffect(() => {
+    const check = async () => {
+      const { useServer, serverUrl } = getServerConnection();
+      if (!useServer || !(serverUrl || '').trim()) {
+        setServerOffline(false);
+        return;
+      }
+      const url = serverUrl.trim().replace(/\/+$/, '');
+      try {
+        const res = await fetch(`${url}/api/auth/me`, { method: 'GET' });
+        setServerOffline(!(res.ok || res.status === 401));
+      } catch (_) {
+        setServerOffline(true);
+      }
+    };
+    check();
+    const t = setInterval(check, 30000);
+    return () => clearInterval(t);
+  }, []);
+
   const handleMenuClick = (e) => {
     setCurrentPage(e.key);
     if (isMobile) setDrawerVisible(false);
@@ -215,7 +261,7 @@ function App() {
           />
         );
       case 'crm-deals':
-        return <Deals />;
+        return <Deals user={user} />;
       case 'crm-contacts':
         return <Contacts />;
       case 'crm-history':
@@ -273,7 +319,11 @@ function App() {
       case 'settings':
         return <Settings />;
       case 'internal-chat':
-        return <InternalChat />;
+        return <InternalChat user={user} />;
+      case 'cabinet':
+        return <PersonalCabinet user={user} />;
+      case 'admin':
+        return <Admin user={user} />;
       case 'notfound':
         return <NotFound onGoHome={() => setCurrentPage('dashboard')} />;
       default:
@@ -328,6 +378,9 @@ function App() {
               <Menu.Item key="dashboard" icon={<HomeOutlined />}>
                 Дашборд
               </Menu.Item>
+              <Menu.Item key="cabinet" icon={<IdcardOutlined />}>
+                Личный кабинет
+              </Menu.Item>
               <SubMenu key="crm-submenu" icon={<UserOutlined />} title="CRM">
                 <Menu.Item key="crm-clients">Клиенты и реестр</Menu.Item>
                 <Menu.Item key="crm-deals">Сделки</Menu.Item>
@@ -374,8 +427,16 @@ function App() {
               <Menu.Item key="settings" icon={<SettingOutlined />}>
                 Настройки
               </Menu.Item>
+              {user?.role === 'admin' && (
+                <Menu.Item key="admin" icon={<TeamOutlined />}>
+                  Администрирование
+                </Menu.Item>
+              )}
               <Menu.Item key="internal-chat" icon={<CommentOutlined />}>
                 Внутренняя переписка
+              </Menu.Item>
+              <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={onLogout}>
+                Выйти
               </Menu.Item>
             </Menu>
           </div>
@@ -406,6 +467,9 @@ function App() {
         <Menu mode="inline" selectedKeys={[currentPage]} onClick={handleMenuClick} style={{ borderRight: 0, background: 'transparent' }}>
           <Menu.Item key="dashboard" icon={<HomeOutlined />}>
             Дашборд
+          </Menu.Item>
+          <Menu.Item key="cabinet" icon={<IdcardOutlined />}>
+            Личный кабинет
           </Menu.Item>
           <SubMenu key="crm-submenu" icon={<UserOutlined />} title="CRM">
             <Menu.Item key="crm-clients">Клиенты и реестр</Menu.Item>
@@ -453,8 +517,16 @@ function App() {
           <Menu.Item key="settings" icon={<SettingOutlined />}>
             Настройки
           </Menu.Item>
+          {user?.role === 'admin' && (
+            <Menu.Item key="admin" icon={<TeamOutlined />}>
+              Администрирование
+            </Menu.Item>
+          )}
           <Menu.Item key="internal-chat" icon={<CommentOutlined />}>
             Внутренняя переписка
+          </Menu.Item>
+          <Menu.Item key="logout" icon={<LogoutOutlined />} onClick={onLogout}>
+            Выйти
           </Menu.Item>
         </Menu>
       </Drawer>
@@ -486,14 +558,28 @@ function App() {
               <span className="header-org-full">СУДЕБНО-ЭКСПЕРТНЫЙ ЦЕНТР «БЮРО ЭКСПЕРТОВ»</span>
               <img src={`${process.env.PUBLIC_URL || ''}/emblem.png`} alt="" className="header-emblem-img" />
             </div>
-            <Space size="middle" style={{ width: 120, justifyContent: 'flex-end' }}>
-              <BellOutlined className="header-icon-dark" style={{ fontSize: 20 }} />
-              <Avatar size="large" icon={<UserOutlined />} style={{ backgroundColor: '#333' }} />
+            <Space size="small" className="header-right-block" style={{ minWidth: 220, justifyContent: 'flex-end', flexShrink: 0 }}>
+              <Badge count={unreadCount} size="small">
+                <BellOutlined className="header-icon-dark" style={{ fontSize: 20 }} />
+              </Badge>
+              <span className="header-user-name" style={{ fontSize: 13, color: '#333' }}>{user?.full_name || user?.email}</span>
+              <Button type="primary" size="small" icon={<LogoutOutlined />} onClick={onLogout}>Выйти</Button>
             </Space>
           </Header>
         </div>
         <div className="app-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
-          <div className="app-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>{renderContent()}</div>
+          <div className="app-content" style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
+            {(serverOffline || isOfflineFallback()) && (
+              <Alert
+                type="warning"
+                showIcon
+                message="Работа в локальном режиме"
+                description="Связь с сервером недоступна. Данные сохраняются локально и будут синхронизированы при появлении связи."
+                style={{ margin: 8, marginBottom: 0 }}
+              />
+            )}
+            {renderContent()}
+          </div>
         </div>
       </Layout>
       <Footer className="app-footer">
@@ -563,6 +649,11 @@ function App() {
           <Menu.Item key="settings" icon={<SettingOutlined />}>
             Настройки
           </Menu.Item>
+          {user?.role === 'admin' && (
+            <Menu.Item key="admin" icon={<TeamOutlined />}>
+              Администрирование
+            </Menu.Item>
+          )}
           <Menu.Item key="internal-chat" icon={<CommentOutlined />}>
             Внутренняя переписка
           </Menu.Item>
