@@ -44,6 +44,7 @@ class DealBase(BaseModel):
     sum_rub: Optional[float] = None
     date: Optional[str] = None
     client_id: Optional[int] = None
+    assignee_id: Optional[int] = None
     number: Optional[str] = None
     contacts: Optional[str] = None
     service_name: Optional[str] = None
@@ -63,6 +64,7 @@ class DealUpdate(BaseModel):
     sum_rub: Optional[float] = None
     date: Optional[str] = None
     client_id: Optional[int] = None
+    assignee_id: Optional[int] = None
     number: Optional[str] = None
     contacts: Optional[str] = None
     service_name: Optional[str] = None
@@ -75,6 +77,7 @@ class DealUpdate(BaseModel):
 class DealResponse(DealBase):
     id: int
     created_at: Optional[datetime] = None
+    assignee_name: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -135,6 +138,12 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserUpdate(BaseModel):
+    """Обновление роли и Ф.И.О. (только админ)."""
+    role: Optional[str] = None
+    full_name: Optional[str] = None
+
+
 class UserResponse(UserBase):
     id: int
     is_active: int = 1
@@ -149,10 +158,65 @@ class UserLogin(BaseModel):
     password: str
 
 
+class UserRegister(BaseModel):
+    """Регистрация первого пользователя (только когда в БД 0 пользователей)."""
+    email: str
+    password: str
+    full_name: Optional[str] = None
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+
+class NotificationCreate(BaseModel):
+    user_id: int
+    message: str
+
+
+class NotificationResponse(BaseModel):
+    id: int
+    user_id: int
+    message: str
+    created_at: Optional[datetime] = None
+    read_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class UserStatsResponse(BaseModel):
+    user_id: int
+    full_name: Optional[str] = None
+    email: str
+    deals_completed: int
+    period_start: str
+    period_end: str
+
+
+class ChatMessageCreate(BaseModel):
+    body: str
+
+
+class ChatMessageResponse(BaseModel):
+    id: int
+    room_key: str
+    sender_id: int
+    sender_name: Optional[str] = None
+    body: str
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ChatRoomResponse(BaseModel):
+    id: str
+    name: str
+    type: str  # "general" | "dm"
+    other_user_id: Optional[int] = None
 
 
 class IntegrationConfigResponse(BaseModel):

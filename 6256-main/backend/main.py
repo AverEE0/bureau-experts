@@ -4,8 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import engine, Base, SessionLocal, _ensure_document_columns, _ensure_deal_columns
-from models import Client, Deal, Document, Communication, User, IntegrationConfig
-from routers import clients, deals, documents, communications, auth, fns, ocr, generate, archive, integrations, signatures, dashboard
+from models import Client, Deal, Document, Communication, User, IntegrationConfig, Notification, ChatMessage
+from routers import clients, deals, documents, communications, auth, fns, ocr, generate, archive, integrations, signatures, dashboard, notifications, stats, admin, chat
 
 Base.metadata.create_all(bind=engine)
 try:
@@ -42,8 +42,8 @@ def seed_if_empty():
                 db.add(Deal(**d))
             db.commit()
         if db.query(User).count() == 0:
-            db.add(User(email="admin@bureau.ru", password_hash=_hash("admin"), role="admin", full_name="Администратор"))
-            db.add(User(email="manager@bureau.ru", password_hash=_hash("manager"), role="manager", full_name="Менеджер"))
+            db.add(User(email="admin", password_hash=_hash("админ"), role="admin", full_name="Администратор"))
+            db.add(User(email="expert", password_hash=_hash("expert"), role="manager", full_name="Эксперт"))
             db.commit()
     finally:
         db.close()
@@ -53,15 +53,22 @@ seed_if_empty()
 
 app = FastAPI(title="БЮРО ЭКСПЕРТОВ API", version="1.0.0")
 
+# Истоки для веб и мобильного приложения (Capacitor/APK)
+_cors_origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "https://averee0.github.io",
+    "capacitor://localhost",
+    "ionic://localhost",
+    "http://localhost",
+    "https://localhost",
+    "null",  # часть мобильных WebView шлёт Origin: null
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-        "https://averee0.github.io",
-    ],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -79,6 +86,10 @@ app.include_router(archive.router)
 app.include_router(integrations.router)
 app.include_router(signatures.router)
 app.include_router(dashboard.router)
+app.include_router(notifications.router)
+app.include_router(stats.router)
+app.include_router(admin.router)
+app.include_router(chat.router)
 
 
 @app.get("/")

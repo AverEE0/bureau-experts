@@ -1,4 +1,4 @@
-"""Auth: login and current user (roles)."""
+"""Auth: login, register (first user), current user (roles)."""
 import hashlib
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, Header
@@ -7,7 +7,7 @@ from typing import Optional
 
 from database import get_db
 from models import User
-from schemas import UserLogin, UserResponse, TokenResponse
+from schemas import UserLogin, UserRegister, UserResponse, TokenResponse
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -19,10 +19,42 @@ def _hash(p: str) -> str:
     return hashlib.sha256(p.encode()).hexdigest()
 
 
+@router.post("/register", response_model=TokenResponse)
+def register(body: UserRegister, db: Session = Depends(get_db)):
+    """Регистрация: если в БД 0 пользователей — создаётся админ; иначе новый пользователь с ролью manager."""
+    if db.query(User).filter(User.email == body.email).first():
+        raise HTTPException(status_code=400, detail="Пользователь с таким логином уже есть")
+    first_user = db.query(User).count() == 0
+    role = "admin" if first_user else "manager"
+    u = User(
+        email=body.email,
+        password_hash=_hash(body.password),
+        role=role,
+        full_name=body.full_name or body.email,
+        is_active=1,
+    )
+    db.add(u)
+    db.commit()
+    db.refresh(u)
+    token = uuid.uuid4().hex
+    _tokens[token] = u.id
+    return TokenResponse(access_token=token, user=UserResponse.model_validate(u))
+
+
+@router.get("/can-register")
+def can_register(db: Session = Depends(get_db)):
+    """Регистрация всегда доступна (новые пользователи получают роль manager, если уже есть пользователи)."""
+    return {"can_register": True}
+
+
 @router.post("/login", response_model=TokenResponse)
 def login(body: UserLogin, db: Session = Depends(get_db)):
-    u = db.query(User).filter(User.email == body.email, User.is_active == 1).first()
-    if not u or u.password_hash != _hash(body.password):
+    u = db.query(User).filter(User.email == body.email).first()
+    if not u:
+        raise HTTPException(status_code=401, detail="Неверный email или пароль")
+    if getattr(u, "is_active", 1) != 1:
+        raise HTTPException(status_code=403, detail="Учётная запись заблокирована. Обратитесь к администратору.")
+    if u.password_hash != _hash(body.password):
         raise HTTPException(status_code=401, detail="Неверный email или пароль")
     token = uuid.uuid4().hex
     _tokens[token] = u.id
