@@ -430,12 +430,24 @@ a:hover,
     margin-bottom: 12px !important;
   }
   .ant-input,
+  .ant-select,
   .ant-select-selector,
   .ant-picker {
     max-width: 100% !important;
   }
   .ant-btn + .ant-btn {
     margin-left: 8px;
+  }
+  /* Внутренний чат: на мобильных боковая панель сверху, блок чата под ней */
+  .internal-chat-content {
+    flex-direction: column !important;
+  }
+  .internal-chat-sidebar {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    max-height: 40vh;
   }
 }
 
